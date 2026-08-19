@@ -1,8 +1,6 @@
 package client;
 
-import command.Command;
 import command.CommandCode;
-import command.CommandException;
 import protocol.Frame;
 import protocol.FrameReader;
 import protocol.FrameWriter;
@@ -48,10 +46,11 @@ public class LaraMQClient {
         }
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    static void main() throws IOException, InterruptedException {
         LaraMQClient client = new LaraMQClient();
 
         client.subscribeToTopic("test");
         Thread.sleep(50000);
+        client.close();
     }
 }

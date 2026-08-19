@@ -4,23 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="Create Maven Project">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/command/Command.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/command/CommandCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/command/CommandException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/command/CommandRegistry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/Frame.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/FrameReader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/FrameWriter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/MessageCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/ProtocolException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Added simple client server communication">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +125,15 @@
       <option name="project" value="LOCAL" />
       <updated>1787092797730</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: Added simple client server communication">
+      <option name="closed" value="true" />
+      <created>1787163406600</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1787163406600</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,6 +152,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create Maven Project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create Maven Project" />
+    <MESSAGE value="feat: Added simple client server communication" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Added simple client server communication" />
   </component>
 </project>

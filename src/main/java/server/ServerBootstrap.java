@@ -12,5 +12,5 @@ public class ServerBootstrap {
         registry.register(CommandCode.SUBSCRIBE, new SubscribeCommand());
 
         return registry;
-    };
+    }
 }

@@ -78,7 +78,7 @@ public class Server implements AutoCloseable {
         }
     }
 
-    public static void main() throws IOException {
+    static void main() throws IOException {
         try (Server server = new Server(Server.PORT)) {
             server.start();
         }
