@@ -3,12 +3,14 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BackgroundAgentGlobalSettings">
+    <option name="selectedModelId" value="auto" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Added simple client server communication">
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Implement broker for topic subscription and publishing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/command/ListCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/ListCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,12 +18,20 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/cdavid/Documents/GitHub/LaraMQ" value="3I96WLkabK461BxEuMfQuWL9t7l" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="29" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Exception" />
         <option value="Record" />
+        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
@@ -29,45 +39,133 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "CDavidSV"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;CDavidSV&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/CDavidSV/LaraMQ",
-    "accountId": "1eda2802-0fdf-45e0-a983-3bdbc73e6373"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/CDavidSV/LaraMQ&quot;,
+    &quot;accountId&quot;: &quot;1eda2802-0fdf-45e0-a983-3bdbc73e6373&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="5.903491949243124E-6" />
+      <entry key="MS500" value="0.08999570740716788" />
+      <entry key="S2" value="0.5477160264163391" />
+      <entry key="S5" value="0.7859993366370347" />
+      <entry key="S10" value="0.8865660362528189" />
+      <entry key="S30" value="0.960661449630131" />
+      <entry key="S60" value="0.9801450798480819" />
+      <entry key="M2" value="1.0086957527769327" />
+      <entry key="M5" value="3.179550528242446" />
+      <entry key="M10" value="15.538097307461094" />
+      <entry key="M15" value="32.39062074371981" />
+      <entry key="M30" value="82.86829458360566" />
+      <entry key="H1" value="158.54640121152886" />
+      <entry key="H2" value="245.01161284966395" />
+      <entry key="H4" value="318.81472747687894" />
+      <entry key="D1" value="408.7069730473818" />
+      <entry key="W1" value="427.71144925010435" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0000000000000953" />
+      <entry key="S60" value="1.0000003304940677" />
+      <entry key="M2" value="1.000770943638382" />
+      <entry key="M5" value="1.180021616604312" />
+      <entry key="M10" value="3.035495917200708" />
+      <entry key="M15" value="6.344937028995274" />
+      <entry key="M30" value="17.344312308457614" />
+      <entry key="H1" value="32.841924728146395" />
+      <entry key="H2" value="47.99575465477852" />
+      <entry key="H4" value="59.39054824702783" />
+      <entry key="D1" value="72.02473456754743" />
+      <entry key="W1" value="74.5644794300422" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="6.550427702286072E-6" />
+      <entry key="MS500" value="0.10174805252519098" />
+      <entry key="S2" value="0.8656966469447281" />
+      <entry key="S5" value="1.4177124539881343" />
+      <entry key="S10" value="1.6812621796171374" />
+      <entry key="S30" value="1.8868976829428397" />
+      <entry key="S60" value="1.942553879495234" />
+      <entry key="M2" value="1.9904373611826869" />
+      <entry key="M5" value="4.348543812146423" />
+      <entry key="M10" value="18.555653644591324" />
+      <entry key="M15" value="38.71044848328196" />
+      <entry key="M30" value="100.17835348024056" />
+      <entry key="H1" value="191.35431243395237" />
+      <entry key="H2" value="292.9807318018524" />
+      <entry key="H4" value="378.18787885018986" />
+      <entry key="D1" value="480.7279853166028" />
+      <entry key="W1" value="502.27537215872974" />
+    </decayedShown>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="3I6kzNLq5QIypwO5mKXTyuEbwVq" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_id" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.LaraMQClient.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.Server.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.LaraMQClient.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Server.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Application.LaraMQClient">
+}</component>
+  <component name="RunManager" selected="Application.Server">
     <configuration name="LaraMQClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="client.LaraMQClient" />
       <module name="LaraMQ" />
@@ -104,8 +202,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
-        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.24374.151" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.27258.48" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.27258.48" />
       </set>
     </attachedChunks>
   </component>
@@ -133,7 +231,23 @@
       <option name="project" value="LOCAL" />
       <updated>1787163406600</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fix: Some code analysis fixes">
+      <option name="closed" value="true" />
+      <created>1787163517953</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1787163517953</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat: Implement broker for topic subscription and publishing">
+      <option name="closed" value="true" />
+      <created>1787204466668</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1787204466668</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,6 +267,12 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create Maven Project" />
     <MESSAGE value="feat: Added simple client server communication" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Added simple client server communication" />
+    <MESSAGE value="fix: Some code analysis fixes" />
+    <MESSAGE value="feat: Implement broker for topic subscription and publishing" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Implement broker for topic subscription and publishing" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

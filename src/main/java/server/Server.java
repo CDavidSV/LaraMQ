@@ -1,5 +1,6 @@
 package server;
 
+import broker.Broker;
 import command.CommandRegistry;
 import protocol.ProtocolException;
 
@@ -21,11 +22,13 @@ public class Server implements AutoCloseable {
     private final ExecutorService executor;
     private volatile boolean running = true;
     private final CommandRegistry commandRegistry;
+    private final Broker broker = new Broker();
 
     Server(int port) throws IOException {
         server = new ServerSocket(port);
         executor = Executors.newVirtualThreadPerTaskExecutor();
-        commandRegistry = ServerBootstrap.buildRegistry();
+
+        commandRegistry = ServerBootstrap.buildRegistry(broker);
     }
 
     public void start() {
@@ -44,26 +47,22 @@ public class Server implements AutoCloseable {
     }
 
     private void handleNewClient(Socket clientSocket) {
-        ClientConnection clientConn = null;
         try {
-            clientConn = new ClientConnection(clientSocket, commandRegistry);
-            logger.info("new client connected (ID: %s)".formatted(clientConn.getId().toString()));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "client error", e);
-        }
+            ClientConnection clientConn = new ClientConnection(clientSocket, commandRegistry);
+            logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
 
-        if (clientConn == null) return;
-
-        try {
-            clientConn.reader();
-        } catch (ProtocolException e) {
-            logger.log(Level.WARNING, "Malformed frame, closing connection (ID: %s): %s".formatted(clientConn.getId(), e.getMessage()));
-        } catch (EOFException e) {
-            logger.info("client disconnected (ID: %s)".formatted(clientConn.getId().toString()));
+            try {
+                clientConn.reader();
+            } catch (ProtocolException e) {
+                logger.log(Level.WARNING, "Malformed frame, closing connection (ID: %s): %s".formatted(clientConn.getId(), e.getMessage()));
+            } catch (EOFException e) {
+                logger.info("client disconnected (ID: %s)".formatted(clientConn.getId()));
+            } finally {
+                broker.unsubscribeAll(clientConn);
+                clientConn.close();
+            }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "client error (ID: %s)".formatted(clientConn.getId().toString()), e);
-        } finally {
-            clientConn.close();
+            logger.log(Level.WARNING, "failed to initialize client connection", e);
         }
     }
 

@@ -1,9 +1,6 @@
 package server;
 
-import command.Command;
-import command.CommandCode;
-import command.CommandException;
-import command.CommandRegistry;
+import command.*;
 import protocol.*;
 
 import java.io.*;
@@ -29,7 +26,6 @@ public class ClientConnection implements AutoCloseable {
     }
 
     public void reader() throws IOException, ProtocolException {
-        System.out.println(socket.isClosed());
         while(true) {
             Frame frame = FrameReader.readFrame(in);
 
@@ -37,16 +33,32 @@ public class ClientConnection implements AutoCloseable {
                 CommandCode code = CommandCode.valueOf(frame.type());
                 Command cmd = cmdRegistry.get(code);
                 DataInputStream payloadIn = new DataInputStream(new ByteArrayInputStream(frame.payload()));
-                cmd.execute(this, payloadIn, out);
-            } catch (CommandException e) {
+                byte[] resData = cmd.execute(this, payloadIn);
+                sendAck(frame.id(), resData);
+            } catch (CommandException | CommandExecutionException | IOException e) {
                 logger.log(Level.WARNING, e.getMessage());
                 sendError(frame.id(), e.getMessage());
             }
         }
     }
 
-    private void sendError(UUID id, String message) throws IOException {
+    public void sendError(UUID id, String message) throws IOException {
         FrameWriter.writeFrame(out, MessageCode.ERROR.code, id, message.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public synchronized void sendAck(UUID id, byte[] data) throws IOException {
+        FrameWriter.writeFrame(out, MessageCode.ACK.code, id, data);
+    }
+
+    public void sendMessage(String topic, byte[] payload) throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(buf);
+        dos.writeUTF(topic);
+        dos.write(payload);
+
+        synchronized (out) {
+            FrameWriter.writeFrame(out, MessageCode.NOTIFICATION.code, UUID.randomUUID(), buf.toByteArray());
+        }
     }
 
     public UUID getId() {

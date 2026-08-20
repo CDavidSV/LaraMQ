@@ -8,22 +8,23 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
-public class SubscribeCommand extends Command {
-    private static final Logger logger = Logger.getLogger(SubscribeCommand.class.getName());
+public class UnsubscribeCommand extends Command {
+    private static final Logger logger = Logger.getLogger(UnsubscribeCommand.class.getName());
     private final Broker broker;
 
-    public SubscribeCommand(Broker broker) {
+    public UnsubscribeCommand(Broker broker) {
         this.broker = broker;
-        logger.info("Subscribe command registered");
+        logger.info("Unsubscribe command registered");
     }
 
+    @Override
     public byte[] execute(ClientConnection conn, DataInputStream in) throws IOException {
         String topic = new String(
-            in.readAllBytes(),
-            StandardCharsets.UTF_8
+                in.readAllBytes(),
+                StandardCharsets.UTF_8
         );
 
-        broker.subscribe(topic, conn);
+        broker.unsubscribe(topic, conn);
         return new byte[0];
     }
 }
