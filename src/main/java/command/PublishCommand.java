@@ -18,10 +18,12 @@ public class PublishCommand extends Command {
 
     @Override
     public byte[] execute(ClientConnection conn, DataInputStream in) throws IOException {
-        String topic = in.readUTF();
+        String topicName = in.readUTF();
+        boolean retain = in.readBoolean();
         byte[] payload = in.readAllBytes();
 
-        broker.publish(topic, payload);
+
+        broker.publish(topicName, payload, retain);
         return new byte[0];
     }
 }

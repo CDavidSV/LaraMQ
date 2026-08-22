@@ -1,41 +1,98 @@
 package broker;
 
+import broker.store.TopicData;
+import broker.store.TopicDataStore;
 import server.ClientConnection;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class Broker {
     private static final Logger logger = Logger.getLogger(Broker.class.getName());
-    private final Map<String, Set<ClientConnection>> subscriptions = new ConcurrentHashMap<>();
+    private final Map<String, Topic> topics = new ConcurrentHashMap<>();
+    private final TopicDataStore topicDataStore;
+    private final Object topicLock = new Object();
 
-    public void subscribe(String topic, ClientConnection connection) {
-        Set<ClientConnection> clientConnections = subscriptions.computeIfAbsent(topic, _ -> ConcurrentHashMap.newKeySet());
-        clientConnections.add(connection);
+    public Broker(TopicDataStore topicDataStore) {
+        this.topicDataStore = topicDataStore;
+
+        for (TopicData topicData : topicDataStore.getAll()) {
+            Topic topic = new Topic(topicData.topicName());
+            topic.setRetainedMessage(topicData.retainedMessage());
+            topics.put(topicData.topicName(), topic);
+        }
+    }
+
+    public Topic subscribe(String topic, ClientConnection connection) {
+        synchronized (topicLock) {
+            Topic t = topics.computeIfAbsent(topic, Topic::new);
+            t.addSubscriber(connection);
+
+            return t;
+        }
     }
 
     public void unsubscribe(String topic, ClientConnection connection) {
-        subscriptions.computeIfPresent(topic, (_t, conns) -> {
-            conns.remove(connection);
-            return conns.isEmpty() ? null : conns;
-        });
+        synchronized (topicLock) {
+            Topic topicObj = topics.get(topic);
+            if (topicObj == null) {
+                return;
+            }
+
+            topicObj.removeSubscriber(connection);
+
+            if (topicObj.canBeRemoved() && topics.remove(topic, topicObj)) {
+                topicDataStore.delete(topic);
+            }
+        }
     }
 
     public void unsubscribeAll(ClientConnection connection) {
-        for (String topic : subscriptions.keySet()) {
+        for (String topic : topics.keySet()) {
             unsubscribe(topic, connection);
         }
     }
 
-    public void publish(String topic, byte[] payload) {
-        Set<ClientConnection> clientConnections = subscriptions.get(topic);
-        if (clientConnections == null) return;
+    public void publish(String topic, byte[] payload, boolean retain) {
+        byte[] safePayload = payload == null ? new byte[0] : payload.clone();
 
-        for (ClientConnection connection : clientConnections) {
+        Topic t;
+
+        if (retain && safePayload.length == 0) {
+            synchronized (topicLock) {
+                t = topics.get(topic);
+                if (t == null) return;
+
+                synchronized (t) {
+                    t.clearRetainedMessage();
+                    topicDataStore.delete(topic);
+                    if (t.canBeRemoved()) {
+                        topics.remove(topic, t);
+                    }
+                }
+            }
+            return;
+        }
+
+        if (retain) {
+            synchronized (topicLock) {
+                t = topics.computeIfAbsent(topic, Topic::new);
+                synchronized (t) {
+                    t.setRetainedMessage(safePayload);
+                    topicDataStore.save(new TopicData(topic, safePayload));
+                }
+            }
+        } else {
+            t = topics.get(topic);
+        }
+
+        if (t == null) return;
+
+        for (ClientConnection connection : t.getSubscribers()) {
             try {
-                connection.sendMessage(topic, payload);
+                connection.sendMessage(topic, safePayload);
             } catch (IOException e) {
                 logger.warning("failed to send notification to client (ID: %s): %s".formatted(connection.getId(), e.getMessage()));
             }
@@ -43,6 +100,10 @@ public class Broker {
     }
 
     public String[] listTopics() {
-        return subscriptions.keySet().toArray(new String[0]);
+        return topics.keySet().toArray(new String[0]);
+    }
+
+    public void shutdown() {
+        topicDataStore.shutdown();
     }
 }

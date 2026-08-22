@@ -1,6 +1,7 @@
 package command;
 
 import broker.Broker;
+import broker.Topic;
 import server.ClientConnection;
 
 import java.io.DataInputStream;
@@ -18,12 +19,13 @@ public class SubscribeCommand extends Command {
     }
 
     public byte[] execute(ClientConnection conn, DataInputStream in) throws IOException {
-        String topic = new String(
-            in.readAllBytes(),
-            StandardCharsets.UTF_8
+        String topicName = new String(
+                in.readAllBytes(),
+                StandardCharsets.UTF_8
         );
 
-        broker.subscribe(topic, conn);
-        return new byte[0];
+        Topic topic = broker.subscribe(topicName, conn);
+        byte[] retainedMessage = topic.getRetainedMessage();
+        return retainedMessage == null ? new byte[0] : retainedMessage;
     }
 }

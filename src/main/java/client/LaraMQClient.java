@@ -27,7 +27,7 @@ public class LaraMQClient {
 
     public void startReader() {
         new Thread(() -> {
-            while(!socket.isClosed()) {
+            while (!socket.isClosed()) {
                 try {
                     Frame frame = FrameReader.readFrame(in);
 
@@ -66,19 +66,41 @@ public class LaraMQClient {
             pending.put(requestId.toString(), future);
             FrameWriter.writeFrame(out, CommandCode.SUBSCRIBE.code, requestId, topic.getBytes(StandardCharsets.UTF_8));
             future.get();
-            System.out.println("Subscribed to topic " + topic);
+            byte[] retainedMessage = future.get().payload();
+
+            if (retainedMessage.length > 0) {
+                System.out.println("Subscribed to topic " + topic + ".\nRetained message: " + new String(retainedMessage, StandardCharsets.UTF_8));
+            } else {
+                System.out.println("Subscribed to topic " + topic + ". No retained message.");
+            }
         } catch (IOException | ExecutionException | InterruptedException e) {
             System.err.println("Error subscribing to topic " + topic);
             e.printStackTrace();
         }
     }
 
-    public synchronized void publishToTopic(String topic, byte[] payload) {
+    public synchronized void unsubscribeFromTopic(String topic) {
+        try {
+            UUID requestId = UUID.randomUUID();
+
+            CompletableFuture<Frame> future = new CompletableFuture<>();
+            pending.put(requestId.toString(), future);
+            FrameWriter.writeFrame(out, CommandCode.UNSUBSCRIBE.code, requestId, topic.getBytes(StandardCharsets.UTF_8));
+            future.get();
+            System.out.println("Unsubscribed from topic " + topic);
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            System.err.println("Error unsubscribing from topic " + topic);
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void publishToTopic(String topic, byte[] payload, boolean retain) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(buf);
 
         try {
             dos.writeUTF(topic);
+            dos.writeBoolean(retain);
             dos.write(payload);
 
             CompletableFuture<Frame> future = new CompletableFuture<>();
@@ -91,6 +113,14 @@ public class LaraMQClient {
             System.err.println("Error publishing to topic " + topic);
             e.printStackTrace();
         }
+    }
+
+    public void publishRetainedMessage(String topic, byte[] payload) {
+        publishToTopic(topic, payload, true);
+    }
+
+    public void clearRetainedMessage(String topic) {
+        publishToTopic(topic, new byte[0], true);
     }
 
     public void close() {
@@ -107,9 +137,16 @@ public class LaraMQClient {
 
         client.subscribeToTopic("test");
         Thread.sleep(2000);
-        client.publishToTopic("test", "Hello World!".getBytes(StandardCharsets.UTF_8));
+        client.publishRetainedMessage("test", "Hello World!".getBytes(StandardCharsets.UTF_8));
+//        Thread.sleep(2000);
+//        client.unsubscribeFromTopic("test");
+//        client.subscribeToTopic("test");
+//        Thread.sleep(2000);
+//        client.clearRetainedMessage("test");
+//        client.unsubscribeFromTopic("test");
+//        client.subscribeToTopic("test");
 
-        Thread.sleep(50000);
+        Thread.sleep(10000);
         client.close();
     }
 }

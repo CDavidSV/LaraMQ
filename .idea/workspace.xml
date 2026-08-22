@@ -8,9 +8,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Implement broker for topic subscription and publishing">
+      <change afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/palantir-java-format.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/broker/Topic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/FileTopicDataStore.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicDataStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/command/ListCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/ListCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/command/PublishCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/PublishCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/protocol/FrameWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protocol/FrameWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,6 +35,7 @@
   <component name="CopilotPersistence">
     <persistenceIdMap>
       <entry key="_/Users/cdavid/Documents/GitHub/LaraMQ" value="3I96WLkabK461BxEuMfQuWL9t7l" />
+      <entry key="_D:/GitHub/LaraMQ" value="3IBxdE54fn9MM4X4lKfmo1xXiIn" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
@@ -30,11 +45,14 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Record" />
         <option value="Exception" />
         <option value="Class" />
+        <option value="Record" />
       </list>
     </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -48,7 +66,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/CDavidSV/LaraMQ&quot;,
-    &quot;accountId&quot;: &quot;1eda2802-0fdf-45e0-a983-3bdbc73e6373&quot;
+    &quot;accountId&quot;: &quot;efed6768-08e5-448e-be67-aac11c959327&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -57,62 +75,65 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="5.903491949243124E-6" />
-      <entry key="MS500" value="0.08999570740716788" />
-      <entry key="S2" value="0.5477160264163391" />
-      <entry key="S5" value="0.7859993366370347" />
-      <entry key="S10" value="0.8865660362528189" />
-      <entry key="S30" value="0.960661449630131" />
-      <entry key="S60" value="0.9801450798480819" />
-      <entry key="M2" value="1.0086957527769327" />
-      <entry key="M5" value="3.179550528242446" />
-      <entry key="M10" value="15.538097307461094" />
-      <entry key="M15" value="32.39062074371981" />
-      <entry key="M30" value="82.86829458360566" />
-      <entry key="H1" value="158.54640121152886" />
-      <entry key="H2" value="245.01161284966395" />
-      <entry key="H4" value="318.81472747687894" />
-      <entry key="D1" value="408.7069730473818" />
-      <entry key="W1" value="427.71144925010435" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000569265086694" />
+      <entry key="S2" value="1.1408202554877194" />
+      <entry key="S5" value="1.6897663767141677" />
+      <entry key="S10" value="2.173908806025908" />
+      <entry key="S30" value="2.6743513279864564" />
+      <entry key="S60" value="2.8300023233779874" />
+      <entry key="M2" value="2.922195150852219" />
+      <entry key="M5" value="3.1209774403811874" />
+      <entry key="M10" value="3.7418506017444417" />
+      <entry key="M15" value="5.424386901560578" />
+      <entry key="M30" value="15.753167204585917" />
+      <entry key="H1" value="43.19449804676346" />
+      <entry key="H2" value="93.9584072950142" />
+      <entry key="H4" value="198.80059920015466" />
+      <entry key="D1" value="636.1910817896342" />
+      <entry key="W1" value="823.511330065474" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0000000000000953" />
-      <entry key="S60" value="1.0000003304940677" />
-      <entry key="M2" value="1.000770943638382" />
-      <entry key="M5" value="1.180021616604312" />
-      <entry key="M10" value="3.035495917200708" />
-      <entry key="M15" value="6.344937028995274" />
-      <entry key="M30" value="17.344312308457614" />
-      <entry key="H1" value="32.841924728146395" />
-      <entry key="H2" value="47.99575465477852" />
-      <entry key="H4" value="59.39054824702783" />
-      <entry key="D1" value="72.02473456754743" />
-      <entry key="W1" value="74.5644794300422" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="1.3345463796864743E-226" />
+      <entry key="S10" value="1.1552256834430877E-113" />
+      <entry key="S30" value="2.260677533683655E-38" />
+      <entry key="S60" value="1.5174808315770373E-19" />
+      <entry key="M2" value="4.516103955322694E-10" />
+      <entry key="M5" value="3.499294665071041E-4" />
+      <entry key="M10" value="0.04013547360443766" />
+      <entry key="M15" value="0.21433379728714502" />
+      <entry key="M30" value="1.5558200601253096" />
+      <entry key="H1" value="5.873823282467045" />
+      <entry key="H2" value="14.080798107613946" />
+      <entry key="H4" value="29.761928521642375" />
+      <entry key="D1" value="94.53577103094807" />
+      <entry key="W1" value="122.41595209422707" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="6.550427702286072E-6" />
-      <entry key="MS500" value="0.10174805252519098" />
-      <entry key="S2" value="0.8656966469447281" />
-      <entry key="S5" value="1.4177124539881343" />
-      <entry key="S10" value="1.6812621796171374" />
-      <entry key="S30" value="1.8868976829428397" />
-      <entry key="S60" value="1.942553879495234" />
-      <entry key="M2" value="1.9904373611826869" />
-      <entry key="M5" value="4.348543812146423" />
-      <entry key="M10" value="18.555653644591324" />
-      <entry key="M15" value="38.71044848328196" />
-      <entry key="M30" value="100.17835348024056" />
-      <entry key="H1" value="191.35431243395237" />
-      <entry key="H2" value="292.9807318018524" />
-      <entry key="H4" value="378.18787885018986" />
-      <entry key="D1" value="480.7279853166028" />
-      <entry key="W1" value="502.27537215872974" />
+      <entry key="MS100" value="0.1285142283320083" />
+      <entry key="MS500" value="0.6634791605542373" />
+      <entry key="S2" value="1.0430522010900443" />
+      <entry key="S5" value="1.6490078475317416" />
+      <entry key="S10" value="2.1531205778967073" />
+      <entry key="S30" value="2.667304778663498" />
+      <entry key="S60" value="2.826461761423472" />
+      <entry key="M2" value="2.920399458801076" />
+      <entry key="M5" value="3.1204644044115777" />
+      <entry key="M10" value="3.780921566362334" />
+      <entry key="M15" value="5.636549339380355" />
+      <entry key="M30" value="17.303350456828014" />
+      <entry key="H1" value="49.059500494982636" />
+      <entry key="H2" value="108.02941813694787" />
+      <entry key="H4" value="228.5523263788494" />
+      <entry key="D1" value="730.7214337582476" />
+      <entry key="W1" value="945.9262778545389" />
     </decayedShown>
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -142,29 +163,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.LaraMQClient.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Server.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.LaraMQClient.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Application.Server.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Application.Server">
     <configuration name="LaraMQClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="client.LaraMQClient" />
@@ -202,8 +226,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.27258.48" />
-        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.27258.48" />
+        <option value="bundled-jdk-30f59d01ecdd-34e2839f716b-intellij.indexing.shared.core-IU-262.9437.185" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.9437.185" />
       </set>
     </attachedChunks>
   </component>
