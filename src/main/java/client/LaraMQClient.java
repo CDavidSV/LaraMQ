@@ -1,8 +1,10 @@
 package client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import command.CommandCode;
 import protocol.*;
 import server.Server;
+import services.analytics.AnalyticsSnapshot;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,6 +20,7 @@ public class LaraMQClient {
     private final DataInputStream in;
     private final DataOutputStream out;
     private final Map<String, CompletableFuture<Frame>> pending = new ConcurrentHashMap<>();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     LaraMQClient() throws IOException {
         socket = new Socket(Server.DOMAIN, Server.PORT);
@@ -123,6 +126,28 @@ public class LaraMQClient {
         publishToTopic(topic, new byte[0], true);
     }
 
+    public synchronized AnalyticsSnapshot getAnalyticsData() throws IOException, ExecutionException, InterruptedException {
+        UUID requestId = UUID.randomUUID();
+
+        CompletableFuture<Frame> future = new CompletableFuture<>();
+        pending.put(requestId.toString(), future);
+        FrameWriter.writeFrame(out, CommandCode.ANALYTICS.code, requestId, new byte[0]);
+        Frame responseFrame = future.get();
+
+        String jsonString = new String(responseFrame.payload(), StandardCharsets.UTF_8);
+        return MAPPER.readValue(jsonString, AnalyticsSnapshot.class);
+
+    }
+
+    public void getAndPrintAnalytics() {
+        try {
+            AnalyticsSnapshot snapshot = getAnalyticsData();
+            System.out.println(snapshot);
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void close() {
         try {
             socket.close();
@@ -138,6 +163,7 @@ public class LaraMQClient {
         client.subscribeToTopic("test");
         Thread.sleep(2000);
         client.publishRetainedMessage("test", "Hello World!".getBytes(StandardCharsets.UTF_8));
+        client.getAndPrintAnalytics();
 //        Thread.sleep(2000);
 //        client.unsubscribeFromTopic("test");
 //        client.subscribeToTopic("test");

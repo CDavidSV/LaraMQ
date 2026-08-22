@@ -2,6 +2,7 @@ package server;
 
 import command.*;
 import protocol.*;
+import services.analytics.AnalyticsService;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,22 +18,25 @@ public class ClientConnection implements AutoCloseable {
     private final DataInputStream in;
     private final DataOutputStream out;
     private final CommandRegistry cmdRegistry;
+    private final AnalyticsService analyticsService;
 
-    ClientConnection(Socket socket, CommandRegistry cmdRegistry) throws IOException {
+    ClientConnection(Socket socket, CommandRegistry cmdRegistry, AnalyticsService analyticsService) throws IOException {
         this.socket = socket;
         this.cmdRegistry = cmdRegistry;
+        this.analyticsService = analyticsService;
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(socket.getOutputStream());
     }
 
     public void reader() throws IOException, ProtocolException {
-        while(true) {
+        while (true) {
             Frame frame = FrameReader.readFrame(in);
 
             try {
                 CommandCode code = CommandCode.valueOf(frame.type());
                 Command cmd = cmdRegistry.get(code);
                 DataInputStream payloadIn = new DataInputStream(new ByteArrayInputStream(frame.payload()));
+                analyticsService.recordCommand(code);
                 byte[] resData = cmd.execute(this, payloadIn);
                 sendAck(frame.id(), resData);
             } catch (CommandException | CommandExecutionException | IOException e) {

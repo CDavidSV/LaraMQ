@@ -3,6 +3,7 @@ package broker;
 import broker.store.TopicData;
 import broker.store.TopicDataStore;
 import server.ClientConnection;
+import services.analytics.AnalyticsService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -14,9 +15,11 @@ public class Broker {
     private final Map<String, Topic> topics = new ConcurrentHashMap<>();
     private final TopicDataStore topicDataStore;
     private final Object topicLock = new Object();
+    private final AnalyticsService analyticsService;
 
-    public Broker(TopicDataStore topicDataStore) {
+    public Broker(TopicDataStore topicDataStore, AnalyticsService analyticsService) {
         this.topicDataStore = topicDataStore;
+        this.analyticsService = analyticsService;
 
         for (TopicData topicData : topicDataStore.getAll()) {
             Topic topic = new Topic(topicData.topicName());
@@ -93,6 +96,7 @@ public class Broker {
         for (ClientConnection connection : t.getSubscribers()) {
             try {
                 connection.sendMessage(topic, safePayload);
+                analyticsService.recordNotification();
             } catch (IOException e) {
                 logger.warning("failed to send notification to client (ID: %s): %s".formatted(connection.getId(), e.getMessage()));
             }

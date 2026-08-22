@@ -7,23 +7,19 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Implement broker for topic subscription and publishing">
-      <change afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/palantir-java-format.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/broker/Topic.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/FileTopicDataStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicDataStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="chore: Update .gitignore to include data files">
+      <change afterPath="$PROJECT_DIR$/src/main/java/command/AnalyticsCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/services/analytics/AnalyticsService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/services/analytics/AnalyticsSnapshot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/broker/store/FileTopicDataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/store/FileTopicDataStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/command/CommandCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/CommandCode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/command/PublishCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/PublishCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protocol/FrameWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protocol/FrameWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/command/UnsubscribeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/UnsubscribeCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
     </list>
@@ -75,61 +71,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0000569265086694" />
-      <entry key="S2" value="1.1408202554877194" />
-      <entry key="S5" value="1.6897663767141677" />
-      <entry key="S10" value="2.173908806025908" />
-      <entry key="S30" value="2.6743513279864564" />
-      <entry key="S60" value="2.8300023233779874" />
-      <entry key="M2" value="2.922195150852219" />
-      <entry key="M5" value="3.1209774403811874" />
-      <entry key="M10" value="3.7418506017444417" />
-      <entry key="M15" value="5.424386901560578" />
-      <entry key="M30" value="15.753167204585917" />
-      <entry key="H1" value="43.19449804676346" />
-      <entry key="H2" value="93.9584072950142" />
-      <entry key="H4" value="198.80059920015466" />
-      <entry key="D1" value="636.1910817896342" />
-      <entry key="W1" value="823.511330065474" />
+      <entry key="MS100" value="4.352157937112791E-115" />
+      <entry key="MS500" value="1.3419748324135893E-23" />
+      <entry key="S2" value="2.056757500645755E-6" />
+      <entry key="S5" value="0.00788335229439714" />
+      <entry key="S10" value="0.14862808158125893" />
+      <entry key="S30" value="1.2306133351032746" />
+      <entry key="S60" value="2.1855496265922754" />
+      <entry key="M2" value="2.9527444622064722" />
+      <entry key="M5" value="3.9648844488061106" />
+      <entry key="M10" value="5.665190617685239" />
+      <entry key="M15" value="7.283782084681322" />
+      <entry key="M30" value="13.281393419818915" />
+      <entry key="H1" value="33.88323945707484" />
+      <entry key="H2" value="88.04769022427007" />
+      <entry key="H4" value="199.58982649807973" />
+      <entry key="D1" value="714.2289720055203" />
+      <entry key="W1" value="966.565527282597" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="1.3345463796864743E-226" />
-      <entry key="S10" value="1.1552256834430877E-113" />
-      <entry key="S30" value="2.260677533683655E-38" />
-      <entry key="S60" value="1.5174808315770373E-19" />
-      <entry key="M2" value="4.516103955322694E-10" />
-      <entry key="M5" value="3.499294665071041E-4" />
-      <entry key="M10" value="0.04013547360443766" />
-      <entry key="M15" value="0.21433379728714502" />
-      <entry key="M30" value="1.5558200601253096" />
-      <entry key="H1" value="5.873823282467045" />
-      <entry key="H2" value="14.080798107613946" />
-      <entry key="H4" value="29.761928521642375" />
-      <entry key="D1" value="94.53577103094807" />
-      <entry key="W1" value="122.41595209422707" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0000000002926863" />
+      <entry key="S60" value="1.0000296328881655" />
+      <entry key="M2" value="1.0100278316265603" />
+      <entry key="M5" value="1.3787203397921086" />
+      <entry key="M10" value="2.3529899177351528" />
+      <entry key="M15" value="3.1393612742049006" />
+      <entry key="M30" value="5.05736766129569" />
+      <entry key="H1" value="9.584275874771057" />
+      <entry key="H2" value="19.734875061326075" />
+      <entry key="H4" value="38.286934703251305" />
+      <entry key="D1" value="117.04946155984648" />
+      <entry key="W1" value="155.1050620015397" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.1285142283320083" />
-      <entry key="MS500" value="0.6634791605542373" />
-      <entry key="S2" value="1.0430522010900443" />
-      <entry key="S5" value="1.6490078475317416" />
-      <entry key="S10" value="2.1531205778967073" />
-      <entry key="S30" value="2.667304778663498" />
-      <entry key="S60" value="2.826461761423472" />
-      <entry key="M2" value="2.920399458801076" />
-      <entry key="M5" value="3.1204644044115777" />
-      <entry key="M10" value="3.780921566362334" />
-      <entry key="M15" value="5.636549339380355" />
-      <entry key="M30" value="17.303350456828014" />
-      <entry key="H1" value="49.059500494982636" />
-      <entry key="H2" value="108.02941813694787" />
-      <entry key="H4" value="228.5523263788494" />
-      <entry key="D1" value="730.7214337582476" />
-      <entry key="W1" value="945.9262778545389" />
+      <entry key="MS100" value="0.0017480958416561966" />
+      <entry key="MS500" value="0.28087497575791126" />
+      <entry key="S2" value="0.7279964449416331" />
+      <entry key="S5" value="0.8880044832771334" />
+      <entry key="S10" value="1.081071760732279" />
+      <entry key="S30" value="2.192339160251645" />
+      <entry key="S60" value="3.1593748086037396" />
+      <entry key="M2" value="3.9467086689542494" />
+      <entry key="M5" value="5.3342724671697095" />
+      <entry key="M10" value="8.010203732062099" />
+      <entry key="M15" value="10.415880483158828" />
+      <entry key="M30" value="18.33196106909972" />
+      <entry key="H1" value="43.458427842476326" />
+      <entry key="H2" value="107.77082540057668" />
+      <entry key="H4" value="237.8643065727017" />
+      <entry key="D1" value="831.2717740367732" />
+      <entry key="W1" value="1121.6693222176407" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -293,7 +289,9 @@
     <MESSAGE value="feat: Added simple client server communication" />
     <MESSAGE value="fix: Some code analysis fixes" />
     <MESSAGE value="feat: Implement broker for topic subscription and publishing" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Implement broker for topic subscription and publishing" />
+    <MESSAGE value="feat: Enhance broker functionality with topic management and persistent storage" />
+    <MESSAGE value="chore: Update .gitignore to include data files" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: Update .gitignore to include data files" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

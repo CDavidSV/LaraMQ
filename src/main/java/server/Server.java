@@ -4,6 +4,7 @@ import broker.Broker;
 import broker.store.FileTopicDataStore;
 import command.CommandRegistry;
 import protocol.ProtocolException;
+import services.analytics.AnalyticsService;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -25,7 +26,8 @@ public class Server implements AutoCloseable {
     private final ExecutorService executor;
     private volatile boolean running = true;
     private final CommandRegistry commandRegistry;
-    private final Broker broker = new Broker(new FileTopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH));
+    private final AnalyticsService analyticsService = new AnalyticsService();
+    private final Broker broker = new Broker(new FileTopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService);
 
     public Server(int port) throws IOException {
         this(DOMAIN, port);
@@ -36,7 +38,7 @@ public class Server implements AutoCloseable {
         server = new ServerSocket(port, 50, InetAddress.getByName(host));
         executor = Executors.newVirtualThreadPerTaskExecutor();
 
-        commandRegistry = ServerBootstrap.buildRegistry(broker);
+        commandRegistry = ServerBootstrap.buildRegistry(broker, analyticsService);
     }
 
     public void start() {
@@ -56,8 +58,9 @@ public class Server implements AutoCloseable {
 
     private void handleNewClient(Socket clientSocket) {
         try {
-            ClientConnection clientConn = new ClientConnection(clientSocket, commandRegistry);
+            ClientConnection clientConn = new ClientConnection(clientSocket, commandRegistry, analyticsService);
             logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
+            analyticsService.recordClientConnected();
 
             try {
                 clientConn.reader();
@@ -68,6 +71,7 @@ public class Server implements AutoCloseable {
             } finally {
                 broker.unsubscribeAll(clientConn);
                 clientConn.close();
+                analyticsService.recordClientDisconnected();
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "client error", e);
