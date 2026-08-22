@@ -31,17 +31,17 @@ public class AnalyticsService {
 
     public void recordPublish(String topic) {
         totalPublishes.increment();
-        publishCountByTopic.computeIfAbsent(topic, k -> new LongAdder()).increment();
+        publishCountByTopic.computeIfAbsent(topic, _ -> new LongAdder()).increment();
     }
 
     public void recordSubscribe(String topic) {
         totalSubscribes.increment();
-        subscriberCountByTopic.computeIfAbsent(topic, k -> new LongAdder()).increment();
+        subscriberCountByTopic.computeIfAbsent(topic, _ -> new LongAdder()).increment();
     }
 
     public void recordUnsubscribe(String topic) {
         totalUnsubscribes.increment();
-        subscriberCountByTopic.computeIfAbsent(topic, k -> new LongAdder()).decrement();
+        subscriberCountByTopic.computeIfAbsent(topic, _ -> new LongAdder()).decrement();
     }
 
     public void recordNotification() {
@@ -50,7 +50,7 @@ public class AnalyticsService {
 
     public void recordCommand(CommandCode commandType) {
         totalCommands.increment();
-        commandCountByType.computeIfAbsent(commandType, k -> new LongAdder()).increment();
+        commandCountByType.computeIfAbsent(commandType, _ -> new LongAdder()).increment();
     }
 
     public void reset() {

@@ -5,8 +5,6 @@ public abstract class TopicDataStore {
 
     public abstract TopicData[] getAll();
 
-    public abstract TopicData get(String topicName);
-
     public abstract void delete(String topicName);
 
     public abstract void shutdown();

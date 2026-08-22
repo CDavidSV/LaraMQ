@@ -55,11 +55,6 @@ public class FileTopicDataStore extends TopicDataStore {
     }
 
     @Override
-    public TopicData get(String topicName) {
-        return data.get(topicName);
-    }
-
-    @Override
     public void delete(String topicName) {
         data.remove(topicName);
 
