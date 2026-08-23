@@ -2,6 +2,10 @@
 
 LaraMQ is a lightweight Java publish/subscribe broker.
 
+It is named after my cat, Lara.
+
+<img src="content/images/Lara.jpg" alt="Lara the cat" width="320" />
+
 ## Build first (required for local runs)
 
 To run the server or client directly with Java, build the project first:
@@ -53,4 +57,3 @@ analytics
 unsubscribe weather
 exit
 ```
-
