@@ -7,8 +7,14 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Implemented command handling and logging in the LaraMQ client">
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Add analytics service for tracking client interactions and command usage">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -32,6 +38,7 @@
         <option value="Exception" />
         <option value="Class" />
         <option value="Record" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -50,70 +57,75 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/CDavidSV/LaraMQ&quot;,
-    &quot;accountId&quot;: &quot;1eda2802-0fdf-45e0-a983-3bdbc73e6373&quot;
+    &quot;accountId&quot;: &quot;efed6768-08e5-448e-be67-aac11c959327&quot;
   }
 }</component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000002112983" />
-      <entry key="MS500" value="1.0116139295658673" />
-      <entry key="S2" value="1.328280281356038" />
-      <entry key="S5" value="1.6404687123273662" />
-      <entry key="S10" value="1.8002933650764006" />
-      <entry key="S30" value="1.9491251099607938" />
-      <entry key="S60" value="2.3166424260885106" />
-      <entry key="M2" value="3.6443168380066786" />
-      <entry key="M5" value="7.718916499577507" />
-      <entry key="M10" value="15.512696985512024" />
-      <entry key="M15" value="22.214157718264143" />
-      <entry key="M30" value="34.15379858905537" />
-      <entry key="H1" value="44.50228095724422" />
-      <entry key="H2" value="65.07918711363756" />
-      <entry key="H4" value="137.15642105385353" />
-      <entry key="D1" value="674.8728055355565" />
-      <entry key="W1" value="1003.8150177316406" />
+      <entry key="MS100" value="0.006992383366624786" />
+      <entry key="MS500" value="0.37061675245070874" />
+      <entry key="S2" value="0.7802454801737035" />
+      <entry key="S5" value="0.9055084441913227" />
+      <entry key="S10" value="0.9515820743326993" />
+      <entry key="S30" value="0.9835929731187251" />
+      <entry key="S60" value="0.9917637509466259" />
+      <entry key="M2" value="0.9993743794381064" />
+      <entry key="M5" value="1.4899508177274348" />
+      <entry key="M10" value="4.388921810039404" />
+      <entry key="M15" value="8.256633163285114" />
+      <entry key="M30" value="17.90809648748785" />
+      <entry key="H1" value="27.693921719562987" />
+      <entry key="H2" value="36.54678254458675" />
+      <entry key="H4" value="67.05462779645121" />
+      <entry key="D1" value="563.4320212692011" />
+      <entry key="W1" value="982.299209998541" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="4.970432478497575E-120" />
-      <entry key="S2" value="1.4931331740371305E-30" />
-      <entry key="S5" value="1.1739224763039282E-12" />
-      <entry key="S10" value="1.0834770308151106E-6" />
-      <entry key="S30" value="0.010270854327942914" />
-      <entry key="S60" value="0.10134552453220957" />
-      <entry key="M2" value="0.31950207189455165" />
-      <entry key="M5" value="0.8262456744645079" />
-      <entry key="M10" value="1.9301632594217035" />
-      <entry key="M15" value="2.9261818078859902" />
-      <entry key="M30" value="4.72299559445905" />
-      <entry key="H1" value="6.414021418160102" />
-      <entry key="H2" value="10.499502006293817" />
-      <entry key="H4" value="23.635183759645653" />
-      <entry key="D1" value="109.28882887637741" />
-      <entry key="W1" value="159.93987435313161" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0000000000000397" />
+      <entry key="S60" value="1.0000003254043215" />
+      <entry key="M2" value="1.0009739449040336" />
+      <entry key="M5" value="1.1214151412005562" />
+      <entry key="M10" value="1.6339645728513137" />
+      <entry key="M15" value="2.130379056993593" />
+      <entry key="M30" value="3.077182271365708" />
+      <entry key="H1" value="3.865039848276099" />
+      <entry key="H2" value="4.714723326223047" />
+      <entry key="H4" value="9.685635833537424" />
+      <entry key="D1" value="88.69946744446622" />
+      <entry key="W1" value="153.62795924997775" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9659363291219939" />
-      <entry key="MS500" value="1.0045465326025766" />
-      <entry key="S2" value="1.325413150461145" />
-      <entry key="S5" value="1.6388885423003414" />
-      <entry key="S10" value="1.7993932723888875" />
-      <entry key="S30" value="1.958324067367776" />
-      <entry key="S60" value="2.4128323976114925" />
-      <entry key="M2" value="3.9538386018959333" />
-      <entry key="M5" value="8.533082371081335" />
-      <entry key="M10" value="17.42821850270797" />
-      <entry key="M15" value="25.125283479142393" />
-      <entry key="M30" value="38.86435478119032" />
-      <entry key="H1" value="50.907842761197756" />
-      <entry key="H2" value="75.57188914033843" />
-      <entry key="H4" value="160.7838170846759" />
-      <entry key="D1" value="784.1554184077826" />
-      <entry key="W1" value="1163.7535860946791" />
+      <entry key="MS100" value="0.007992454121184149" />
+      <entry key="MS500" value="0.49008406037434393" />
+      <entry key="S2" value="1.360745582118378" />
+      <entry key="S5" value="1.7095219898173797" />
+      <entry key="S10" value="1.848171430883089" />
+      <entry key="S30" value="1.9478433151846744" />
+      <entry key="S60" value="1.9737243340273949" />
+      <entry key="M2" value="1.9912627271314074" />
+      <entry key="M5" value="2.6064221259894267" />
+      <entry key="M10" value="6.0172251914508275" />
+      <entry key="M15" value="10.380925281079588" />
+      <entry key="M30" value="20.979815191598956" />
+      <entry key="H1" value="31.555150176803906" />
+      <entry key="H2" value="41.25900964741377" />
+      <entry key="H4" value="76.73729876161485" />
+      <entry key="D1" value="652.1264196287414" />
+      <entry key="W1" value="1135.9259074280892" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -173,7 +185,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.Server">
+  <component name="RunManager" selected="Application.LaraMQClient">
     <configuration name="LaraMQClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="client.LaraMQClient" />
       <module name="LaraMQ" />
@@ -183,6 +195,13 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="LaraMQ" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -202,8 +221,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Server" />
         <item itemvalue="Application.LaraMQClient" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Server" />
       </list>
     </recent_temporary>
   </component>
@@ -280,9 +300,7 @@
     <MESSAGE value="feat: Enhance broker functionality with topic management and persistent storage" />
     <MESSAGE value="chore: Update .gitignore to include data files" />
     <MESSAGE value="feat: Add analytics service for tracking client interactions and command usage" />
-    <MESSAGE value="refactor: Simplify lambda expressions in analytics service methods" />
-    <MESSAGE value="feat: Implemented command handling and logging in the LaraMQ client" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Implemented command handling and logging in the LaraMQ client" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add analytics service for tracking client interactions and command usage" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

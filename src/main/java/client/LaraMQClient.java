@@ -69,7 +69,7 @@ public class LaraMQClient {
             return;
         }
 
-        String command = parts[0];
+        String command = parts[0].toLowerCase(Locale.ROOT);
 
         switch (command) {
             case "subscribe" -> {
@@ -94,15 +94,16 @@ public class LaraMQClient {
                     return;
                 }
 
+                boolean retain = parts[parts.length - 1].toLowerCase(Locale.ROOT).equalsIgnoreCase("retain");
+
                 String topic = parts[1];
-                String message = String.join(" ", java.util.Arrays.copyOfRange(parts, 2, parts.length - (parts[parts.length - 1].equalsIgnoreCase("retain") ? 1 : 0)));
+                String message = String.join(" ", java.util.Arrays.copyOfRange(parts, 2, parts.length - (retain ? 1 : 0)));
 
                 if (message.isEmpty()) {
                     log(LogLevel.WARNING, "Message cannot be empty");
                     return;
                 }
 
-                boolean retain = parts[parts.length - 1].equalsIgnoreCase("retain");
                 publishToTopic(topic, message.getBytes(StandardCharsets.UTF_8), retain);
             }
             case "clear-retained" -> {
@@ -180,7 +181,7 @@ public class LaraMQClient {
     public void startREPL() {
         while (true) {
             String line = reader.readLine("LaraMQ> ");
-            String[] parts = line.trim().toLowerCase(Locale.ROOT).split("\\s+");
+            String[] parts = line.trim().split("\\s+");
             handleCommand(parts);
         }
     }

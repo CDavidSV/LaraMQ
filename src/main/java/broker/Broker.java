@@ -6,6 +6,7 @@ import server.ClientConnection;
 import services.analytics.AnalyticsService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -93,9 +94,16 @@ public class Broker {
 
         if (t == null) return;
 
-        for (ClientConnection connection : t.getSubscribers()) {
+        List<ClientConnection> subscribers = List.copyOf(t.getSubscribers());
+        if (subscribers.isEmpty()) return;
+
+        Thread.startVirtualThread(() -> broadcast(topic, safePayload, subscribers));
+    }
+
+    private void broadcast(String topic, byte[] payload, List<ClientConnection> subscribers) {
+        for (ClientConnection connection : subscribers) {
             try {
-                connection.sendMessage(topic, safePayload);
+                connection.sendMessage(topic, payload);
                 analyticsService.recordNotification();
             } catch (IOException e) {
                 logger.warning("failed to send notification to client (ID: %s): %s".formatted(connection.getId(), e.getMessage()));
