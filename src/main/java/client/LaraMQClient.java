@@ -226,7 +226,7 @@ public class LaraMQClient {
             log(LogLevel.ERROR, "Error publishing to topic [" + topic + "]: " + e.getMessage());
         }
     }
-    
+
     public void clearRetainedMessage(String topic) {
         publishToTopic(topic, new byte[0], true);
     }

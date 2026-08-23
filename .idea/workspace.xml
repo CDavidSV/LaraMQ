@@ -7,9 +7,8 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="refactor: Simplify lambda expressions in analytics service methods">
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Implemented command handling and logging in the LaraMQ client">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,61 +59,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="4.3073274571657257E-85" />
-      <entry key="MS500" value="2.060060497548803E-17" />
-      <entry key="S2" value="1.2258567283399648E-4" />
-      <entry key="S5" value="0.052771082518505215" />
-      <entry key="S10" value="0.437007660093343" />
-      <entry key="S30" value="2.0148340348842297" />
-      <entry key="S60" value="3.484043425113349" />
-      <entry key="M2" value="5.222939099084379" />
-      <entry key="M5" value="9.051375266002301" />
-      <entry key="M10" value="16.993420553946223" />
-      <entry key="M15" value="23.54987156945459" />
-      <entry key="M30" value="34.70474706903695" />
-      <entry key="H1" value="44.155875925229054" />
-      <entry key="H2" value="64.29440633776308" />
-      <entry key="H4" value="136.4519248869875" />
-      <entry key="D1" value="673.9433734579661" />
-      <entry key="W1" value="1002.0425648638089" />
+      <entry key="MS100" value="1.0000000002112983" />
+      <entry key="MS500" value="1.0116139295658673" />
+      <entry key="S2" value="1.328280281356038" />
+      <entry key="S5" value="1.6404687123273662" />
+      <entry key="S10" value="1.8002933650764006" />
+      <entry key="S30" value="1.9491251099607938" />
+      <entry key="S60" value="2.3166424260885106" />
+      <entry key="M2" value="3.6443168380066786" />
+      <entry key="M5" value="7.718916499577507" />
+      <entry key="M10" value="15.512696985512024" />
+      <entry key="M15" value="22.214157718264143" />
+      <entry key="M30" value="34.15379858905537" />
+      <entry key="H1" value="44.50228095724422" />
+      <entry key="H2" value="65.07918711363756" />
+      <entry key="H4" value="137.15642105385353" />
+      <entry key="D1" value="674.8728055355565" />
+      <entry key="W1" value="1003.8150177316406" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0000000000030973" />
-      <entry key="S60" value="1.0000029702839233" />
-      <entry key="M2" value="1.0036263067535651" />
-      <entry key="M5" value="1.3060161335744715" />
-      <entry key="M10" value="2.4266867347013443" />
-      <entry key="M15" value="3.4086396145808777" />
-      <entry key="M30" value="5.09750230674756" />
-      <entry key="H1" value="6.663468531308071" />
-      <entry key="H2" value="10.701722207973358" />
-      <entry key="H4" value="23.86170485010545" />
-      <entry key="D1" value="109.4627076408523" />
-      <entry key="W1" value="159.97620168883182" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="4.970432478497575E-120" />
+      <entry key="S2" value="1.4931331740371305E-30" />
+      <entry key="S5" value="1.1739224763039282E-12" />
+      <entry key="S10" value="1.0834770308151106E-6" />
+      <entry key="S30" value="0.010270854327942914" />
+      <entry key="S60" value="0.10134552453220957" />
+      <entry key="M2" value="0.31950207189455165" />
+      <entry key="M5" value="0.8262456744645079" />
+      <entry key="M10" value="1.9301632594217035" />
+      <entry key="M15" value="2.9261818078859902" />
+      <entry key="M30" value="4.72299559445905" />
+      <entry key="H1" value="6.414021418160102" />
+      <entry key="H2" value="10.499502006293817" />
+      <entry key="H4" value="23.635183759645653" />
+      <entry key="D1" value="109.28882887637741" />
+      <entry key="W1" value="159.93987435313161" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.9048012525964537E-5" />
-      <entry key="MS500" value="0.1137548530101124" />
-      <entry key="S2" value="0.5808620131589431" />
-      <entry key="S5" value="0.8533283691381943" />
-      <entry key="S10" value="1.313267445611228" />
-      <entry key="S30" value="2.94260141435284" />
-      <entry key="S60" value="4.434843434843334" />
-      <entry key="M2" value="6.195483884587537" />
-      <entry key="M5" value="10.33835181043727" />
-      <entry key="M10" value="19.401720774304387" />
-      <entry key="M15" value="26.94098618780655" />
-      <entry key="M30" value="39.788829828640566" />
-      <entry key="H1" value="50.81055883945241" />
-      <entry key="H2" value="74.98919907023554" />
-      <entry key="H4" value="160.3057680990589" />
-      <entry key="D1" value="783.3998553255185" />
-      <entry key="W1" value="1162.0174602831114" />
+      <entry key="MS100" value="0.9659363291219939" />
+      <entry key="MS500" value="1.0045465326025766" />
+      <entry key="S2" value="1.325413150461145" />
+      <entry key="S5" value="1.6388885423003414" />
+      <entry key="S10" value="1.7993932723888875" />
+      <entry key="S30" value="1.958324067367776" />
+      <entry key="S60" value="2.4128323976114925" />
+      <entry key="M2" value="3.9538386018959333" />
+      <entry key="M5" value="8.533082371081335" />
+      <entry key="M10" value="17.42821850270797" />
+      <entry key="M15" value="25.125283479142393" />
+      <entry key="M30" value="38.86435478119032" />
+      <entry key="H1" value="50.907842761197756" />
+      <entry key="H2" value="75.57188914033843" />
+      <entry key="H4" value="160.7838170846759" />
+      <entry key="D1" value="784.1554184077826" />
+      <entry key="W1" value="1163.7535860946791" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -174,7 +173,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.LaraMQClient">
+  <component name="RunManager" selected="Application.Server">
     <configuration name="LaraMQClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="client.LaraMQClient" />
       <module name="LaraMQ" />
@@ -203,8 +202,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.LaraMQClient" />
         <item itemvalue="Application.Server" />
+        <item itemvalue="Application.LaraMQClient" />
       </list>
     </recent_temporary>
   </component>
@@ -282,7 +281,8 @@
     <MESSAGE value="chore: Update .gitignore to include data files" />
     <MESSAGE value="feat: Add analytics service for tracking client interactions and command usage" />
     <MESSAGE value="refactor: Simplify lambda expressions in analytics service methods" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: Simplify lambda expressions in analytics service methods" />
+    <MESSAGE value="feat: Implemented command handling and logging in the LaraMQ client" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Implemented command handling and logging in the LaraMQ client" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
