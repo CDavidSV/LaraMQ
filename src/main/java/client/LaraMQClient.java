@@ -84,8 +84,8 @@ public class LaraMQClient {
         FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
     }
 
-    static UUID loadOrCreateClientId(Path configFile) throws IOException {
-        Path normalizedConfigFile = configFile.toAbsolutePath().normalize();
+    static UUID loadOrCreateClientId() throws IOException {
+        Path normalizedConfigFile = LaraMQClient.DEFAULT_CLIENT_CONFIG_PATH.toAbsolutePath().normalize();
         Path parent = normalizedConfigFile.getParent();
         if (parent != null) {
             Files.createDirectories(parent);
@@ -315,7 +315,7 @@ public class LaraMQClient {
 
 
     static void main() throws IOException {
-        UUID clientId = loadOrCreateClientId(DEFAULT_CLIENT_CONFIG_PATH);
+        UUID clientId = loadOrCreateClientId();
         LaraMQClient client = new LaraMQClient(clientId);
         client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
         client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");

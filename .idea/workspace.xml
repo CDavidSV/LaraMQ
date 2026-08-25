@@ -7,27 +7,9 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="Update readme">
-      <change afterPath="$PROJECT_DIR$/src/main/java/protocol/AuthenticationException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ClientHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ClientSession.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ClientSessionData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/ClientSessionDataStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Enhance client session management and topic subscription handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/broker/Topic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Topic.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/broker/store/FileTopicDataStore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/broker/store/TopicData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/broker/store/TopicDataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/store/TopicDataStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/SubscribeCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/command/UnsubscribeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/command/UnsubscribeCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protocol/MessageCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protocol/MessageCode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,8 +223,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.LaraMQClient" />
         <item itemvalue="Application.Server" />
+        <item itemvalue="Application.LaraMQClient" />
         <item itemvalue="Application.MultiPublisherClient" />
       </list>
     </recent_temporary>
@@ -323,7 +305,8 @@
     <MESSAGE value="refactor: Simplify lambda expressions in analytics service methods" />
     <MESSAGE value="feat: Implemented command handling and logging in the LaraMQ client" />
     <MESSAGE value="Update readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update readme" />
+    <MESSAGE value="feat: Enhance client session management and topic subscription handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Enhance client session management and topic subscription handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
