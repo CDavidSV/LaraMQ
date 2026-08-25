@@ -12,6 +12,15 @@
             </PendingDiffInfo>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/server/ServerBootstrap.java" />
+              <option name="originalContent" value="package server;&#10;&#10;import broker.Broker;&#10;import command.*;&#10;import services.analytics.AnalyticsService;&#10;&#10;import java.nio.file.Path;&#10;&#10;public class ServerBootstrap {&#10;    private static final Path DEFAULT_DIR = Path.of(&quot;data&quot;);&#10;    public static final Path DEFAULT_TOPIC_DATA_FILE_PATH = DEFAULT_DIR.resolve(&quot;topic_data.json&quot;);&#10;&#10;    public static CommandRegistry buildRegistry(Broker broker, AnalyticsService analyticsService) {&#10;        CommandRegistry registry = new CommandRegistry();&#10;&#10;        // Register commands here&#10;        registry.register(CommandCode.SUBSCRIBE, new SubscribeCommand(broker, analyticsService));&#10;        registry.register(CommandCode.UNSUBSCRIBE, new UnsubscribeCommand(broker, analyticsService));&#10;        registry.register(CommandCode.PUBLISH, new PublishCommand(broker, analyticsService));&#10;        registry.register(CommandCode.LIST, new ListCommand(broker));&#10;        registry.register(CommandCode.ANALYTICS, new AnalyticsCommand(analyticsService));&#10;&#10;        return registry;&#10;    }&#10;}&#10;" />
+              <option name="updatedContent" value="package server;&#10;&#10;import broker.Broker;&#10;import command.*;&#10;import services.analytics.AnalyticsService;&#10;&#10;import java.nio.file.Path;&#10;&#10;public class ServerBootstrap {&#10;    private static final Path DEFAULT_DIR = Path.of(&quot;data&quot;);&#10;    public static final Path DEFAULT_TOPIC_DATA_FILE_PATH = DEFAULT_DIR.resolve(&quot;topic_data.json&quot;);&#10;    public static final Path DEFAULT_CLIENT_SESSION_DATA_FILE_PATH = DEFAULT_DIR.resolve(&quot;client_sessions.json&quot;);&#10;&#10;    public static CommandRegistry buildRegistry(Broker broker, AnalyticsService analyticsService) {&#10;        CommandRegistry registry = new CommandRegistry();&#10;&#10;        // Register commands here&#10;        registry.register(CommandCode.SUBSCRIBE, new SubscribeCommand(broker, analyticsService));&#10;        registry.register(CommandCode.UNSUBSCRIBE, new UnsubscribeCommand(broker, analyticsService));&#10;        registry.register(CommandCode.PUBLISH, new PublishCommand(broker, analyticsService));&#10;        registry.register(CommandCode.LIST, new ListCommand(broker));&#10;        registry.register(CommandCode.ANALYTICS, new AnalyticsCommand(analyticsService));&#10;&#10;        return registry;&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

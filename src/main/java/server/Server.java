@@ -1,16 +1,16 @@
 package server;
 
 import broker.Broker;
-import broker.store.FileTopicDataStore;
+import broker.store.TopicDataStore;
 import command.CommandRegistry;
-import protocol.ProtocolException;
+import protocol.*;
 import services.analytics.AnalyticsService;
 
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -27,7 +27,8 @@ public class Server implements AutoCloseable {
     private volatile boolean running = true;
     private final CommandRegistry commandRegistry;
     private final AnalyticsService analyticsService = new AnalyticsService();
-    private final Broker broker = new Broker(new FileTopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService);
+    private final ClientSessionHandler clientSessionHandler = new ClientSessionHandler(ServerBootstrap.DEFAULT_CLIENT_SESSION_DATA_FILE_PATH);
+    private final Broker broker = new Broker(new TopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService, clientSessionHandler);
 
     public Server(int port) throws IOException {
         this(DOMAIN, port);
@@ -56,11 +57,40 @@ public class Server implements AutoCloseable {
         }
     }
 
+    private UUID authenticateClient(DataInputStream in) throws IOException, ProtocolException, AuthenticationException {
+        Frame frame = FrameReader.readFrame(in);
+
+        if (frame.type() != MessageCode.AUTHENTICATE.code) {
+            throw new ProtocolException("Expected AUTHENTICATE message, got: " + frame.type());
+        }
+
+        DataInputStream authenticationPayload = new DataInputStream(new ByteArrayInputStream(frame.payload()));
+        String clientIdString = authenticationPayload.readUTF();
+        try {
+            return UUID.fromString(clientIdString);
+        } catch (IllegalArgumentException e) {
+            throw new AuthenticationException("Invalid UUID format: " + clientIdString);
+        }
+    }
+
     private void handleNewClient(Socket clientSocket) {
         try {
-            ClientConnection clientConn = new ClientConnection(clientSocket, commandRegistry, analyticsService);
-            logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
+            DataInputStream in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+            UUID clientId = authenticateClient(in);
+            ClientSession session = clientSessionHandler.getOrCreate(clientId);
+
+            ClientConnection existingConnection = session.getClientConnection();
+            if (existingConnection != null) {
+                logger.info("Client (ID: %s) is already connected. Closing the existing connection.".formatted(clientId));
+                existingConnection.close();
+            }
+
+            ClientConnection clientConn = new ClientConnection(clientSocket, in, commandRegistry, analyticsService, clientId);
+            session.setClientConnection(clientConn);
             analyticsService.recordClientConnected();
+            logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
+
+            session.flushUndeliveredMessages();
 
             try {
                 clientConn.reader();
@@ -69,11 +99,14 @@ public class Server implements AutoCloseable {
             } catch (EOFException e) {
                 logger.info("client disconnected (ID: %s)".formatted(clientConn.getId()));
             } finally {
-                broker.unsubscribeAll(clientConn);
+                // broker.unsubscribeAll(clientId.toString());
+                session.setClientConnection(null);
                 clientConn.close();
                 analyticsService.recordClientDisconnected();
             }
-        } catch (IOException e) {
+        } catch (AuthenticationException e) {
+            logger.log(Level.WARNING, "authentication failed", e);
+        } catch (IOException | ProtocolException e) {
             logger.log(Level.WARNING, "client error", e);
         }
     }
@@ -87,6 +120,7 @@ public class Server implements AutoCloseable {
         running = false;
         try {
             broker.shutdown();
+            clientSessionHandler.close();
             server.close();
             executor.shutdown();
         } catch (IOException e) {

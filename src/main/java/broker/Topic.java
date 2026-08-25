@@ -1,14 +1,12 @@
 package broker;
 
-import server.ClientConnection;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Topic {
     private final String name;
     private byte[] retainedMessage;
-    private final Set<ClientConnection> subscribers = ConcurrentHashMap.newKeySet();
+    private final Set<String> subscribers = ConcurrentHashMap.newKeySet();
 
     public Topic(String name) {
         this.name = name;
@@ -34,15 +32,15 @@ public class Topic {
         return subscribers.isEmpty() && retainedMessage == null;
     }
 
-    protected Set<ClientConnection> getSubscribers() {
+    protected Set<String> getSubscribers() {
         return subscribers;
     }
 
-    protected void addSubscriber(ClientConnection connection) {
-        subscribers.add(connection);
+    protected void addSubscriber(String clientId) {
+        subscribers.add(clientId);
     }
 
-    protected void removeSubscriber(ClientConnection connection) {
-        subscribers.remove(connection);
+    protected void removeSubscriber(String clientId) {
+        subscribers.remove(clientId);
     }
 }

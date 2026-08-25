@@ -27,7 +27,7 @@ public class UnsubscribeCommand extends Command {
                 StandardCharsets.UTF_8
         );
 
-        broker.unsubscribe(topic, conn);
+        broker.unsubscribe(topic, conn.getId().toString());
         analyticsService.recordUnsubscribe(topic);
         return new byte[0];
     }

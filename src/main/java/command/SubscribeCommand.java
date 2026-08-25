@@ -27,7 +27,7 @@ public class SubscribeCommand extends Command {
                 StandardCharsets.UTF_8
         );
 
-        Topic topic = broker.subscribe(topicName, conn);
+        Topic topic = broker.subscribe(topicName, conn.getId().toString());
         byte[] retainedMessage = topic.getRetainedMessage();
         analyticsService.recordSubscribe(topicName);
         return retainedMessage == null ? new byte[0] : retainedMessage;

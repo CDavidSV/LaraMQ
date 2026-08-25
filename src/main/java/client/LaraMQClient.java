@@ -1,5 +1,6 @@
 package client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import command.CommandCode;
 import org.jline.reader.LineReader;
@@ -14,14 +15,20 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 public class LaraMQClient {
+    private static final Path DEFAULT_CLIENT_CONFIG_PATH = Path.of("data", "client_config.json");
+
     enum LogLevel {
         SUCCESS(GREEN, "✓"),
         INFO(BLUE, "ℹ"),
@@ -41,6 +48,7 @@ public class LaraMQClient {
     private final Socket socket;
     private final DataInputStream in;
     private final DataOutputStream out;
+    private final UUID clientId;
     private final Map<String, CompletableFuture<Frame>> pending = new ConcurrentHashMap<>();
     private final Terminal terminal = TerminalBuilder.builder().build();
     private final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
@@ -53,15 +61,56 @@ public class LaraMQClient {
     private static final String RED = "\u001B[31m";
     private static final String BLUE = "\u001B[34m";
 
+    private record ClientConfig(String clientId) {
+    }
+
     private void log(LogLevel level, String message) {
         String formatted = String.format("%s%s %s%s%s", level.color, level.symbol, message, RESET, "");
         reader.printAbove(formatted);
     }
 
-    LaraMQClient() throws IOException {
+    LaraMQClient(UUID clientId) throws IOException {
+        this.clientId = Objects.requireNonNull(clientId, "clientId cannot be null");
         socket = new Socket(Server.DOMAIN, Server.PORT);
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(socket.getOutputStream());
+        authenticate();
+    }
+
+    private void authenticate() throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        DataOutputStream payloadOut = new DataOutputStream(buf);
+        payloadOut.writeUTF(clientId.toString());
+        FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
+    }
+
+    static UUID loadOrCreateClientId(Path configFile) throws IOException {
+        Path normalizedConfigFile = configFile.toAbsolutePath().normalize();
+        Path parent = normalizedConfigFile.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+
+        if (Files.exists(normalizedConfigFile) && Files.size(normalizedConfigFile) > 0L) {
+            try {
+                ClientConfig config = MAPPER.readValue(normalizedConfigFile.toFile(), ClientConfig.class);
+                if (config != null && config.clientId() != null && !config.clientId().isBlank()) {
+                    return UUID.fromString(config.clientId());
+                }
+            } catch (JsonProcessingException | IllegalArgumentException e) {
+                // Regenerate and overwrite invalid config content.
+            }
+        }
+
+        UUID generatedClientId = UUID.randomUUID();
+        writeClientConfig(normalizedConfigFile, generatedClientId);
+        return generatedClientId;
+    }
+
+    private static void writeClientConfig(Path configFile, UUID clientId) throws IOException {
+        Path tmpFile = configFile.resolveSibling(configFile.getFileName() + ".tmp");
+        MAPPER.writerWithDefaultPrettyPrinter().writeValue(tmpFile.toFile(), new ClientConfig(clientId.toString()));
+        Files.move(tmpFile, configFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 
     private void handleCommand(String[] parts) {
@@ -149,7 +198,14 @@ public class LaraMQClient {
         UUID requestId = UUID.randomUUID();
         CompletableFuture<Frame> future = new CompletableFuture<>();
         pending.put(requestId.toString(), future);
-        FrameWriter.writeFrame(out, commandCode, requestId, payload);
+
+        // Prepend the CommandCode byte to the payload so the server can distinguish
+        // the command type independently of the frame's MessageCode.
+        ByteArrayOutputStream buf = new ByteArrayOutputStream(1 + payload.length);
+        buf.write(commandCode);
+        buf.write(payload);
+
+        FrameWriter.writeFrame(out, MessageCode.COMMAND.code, requestId, buf.toByteArray());
         return future.get();
     }
 
@@ -259,8 +315,9 @@ public class LaraMQClient {
 
 
     static void main() throws IOException {
-        LaraMQClient client = new LaraMQClient();
-        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker");
+        UUID clientId = loadOrCreateClientId(DEFAULT_CLIENT_CONFIG_PATH);
+        LaraMQClient client = new LaraMQClient(clientId);
+        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
         client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");
         client.startReader();
         client.startREPL();
