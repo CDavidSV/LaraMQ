@@ -39,7 +39,7 @@ LaraMQ uses a custom binary framing protocol over TCP:
 
 | Code           | Direction        | Description                                                |
 |----------------|------------------|------------------------------------------------------------|
-| `AUTHENTICATE` | Client → Server  | Client sends its UUID to authenticate on connect           |
+| `AUTHENTICATE` | Client → Server  | Client sends its UUID and an optional session-reset flag   |
 | `ACK`          | Server → Client  | Successful command response                                |
 | `ERROR`        | Server → Client  | Command or protocol error                                  |
 | `NOTIFICATION` | Server → Client  | Real-time message delivery to subscriber                   |
@@ -59,6 +59,7 @@ All commands are sent as UTF-8 text in the frame payload.
 | `unsubscribe <topic>`              | Unsubscribe from a topic.                                          |
 | `publish <topic> <message>`        | Publish a message to a topic.                                      |
 | `publish <topic> <message> retain` | Publish and retain the message for future subscribers.             |
+| `clear-retained <topic>`           | Clear the retained message for a topic.                            |
 | `list`                             | List all active topics on the broker.                              |
 | `analytics`                        | Retrieve a JSON snapshot of broker runtime metrics.                |
 | `exit`                             | Disconnect from the broker.                                        |
@@ -67,9 +68,24 @@ All commands are sent as UTF-8 text in the frame payload.
 
 ## Authentication & Session Management
 
-1. On the **first connection**, the broker generates a UUID and sends it to the client via an `AUTHENTICATE` frame. The client stores this UUID locally in `data/client_config.json`.
+1. On the **first connection**, the client generates a UUID and stores it locally in `data/client_config.json`.
 2. On **subsequent connections**, the client sends its stored UUID, and the broker restores the associated session (subscriptions + undelivered messages).
 3. Undelivered messages (published while the client was offline) are **automatically flushed** to the client upon reconnect.
+4. Optionally, the client can request a full session reset during authentication (see below).
+
+### Optional Session Reset on Connect
+
+Run the client with `--reset-session` to clear an existing server-side session for that client UUID:
+
+```bash
+java -cp target/LaraMQ.jar client.LaraMQClient --reset-session
+```
+
+When this flag is used and a session already exists, the broker will:
+
+1. Unsubscribe the client from all topics.
+2. Clear the session's stored subscription list.
+3. Clear queued undelivered messages for that session.
 
 ---
 
@@ -139,6 +155,12 @@ In another terminal, from the project root:
 java -cp target/LaraMQ.jar client.LaraMQClient
 ```
 
+Start with a clean server-side session (keep same UUID identity):
+
+```bash
+java -cp target/LaraMQ.jar client.LaraMQClient --reset-session
+```
+
 ---
 
 ## Quick command examples
@@ -147,6 +169,7 @@ java -cp target/LaraMQ.jar client.LaraMQClient
 subscribe weather
 publish weather sunny retain
 publish weather rainy
+clear-retained weather
 list
 analytics
 unsubscribe weather

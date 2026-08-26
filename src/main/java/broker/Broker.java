@@ -26,7 +26,9 @@ public class Broker {
         this.analyticsService = analyticsService;
         this.clientSessionHandler = clientSessionHandler;
 
+        boolean loadedData = false;
         for (TopicData topicData : topicDataStore.getAll()) {
+            loadedData = true;
             Topic topic = new Topic(topicData.topicName());
             topic.setRetainedMessage(topicData.retainedMessage());
             topics.put(topicData.topicName(), topic);
@@ -34,6 +36,10 @@ public class Broker {
             for (String subscriber : topicData.subscribers()) {
                 topic.addSubscriber(subscriber);
             }
+        }
+
+        if (loadedData) {
+            logger.info("Loaded topic data from persistent storage");
         }
     }
 

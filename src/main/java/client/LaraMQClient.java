@@ -18,13 +18,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class LaraMQClient {
     private static final Path DEFAULT_CLIENT_CONFIG_PATH = Path.of("data", "client_config.json");
@@ -49,9 +47,11 @@ public class LaraMQClient {
     private final DataInputStream in;
     private final DataOutputStream out;
     private final UUID clientId;
+    private final boolean clearSessionIfExists;
     private final Map<String, CompletableFuture<Frame>> pending = new ConcurrentHashMap<>();
     private final Terminal terminal = TerminalBuilder.builder().build();
     private final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
+    private final Map<String, Consumer<String[]>> commandHandlers = createCommandHandlers();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String RESET = "\u001B[0m";
@@ -70,7 +70,12 @@ public class LaraMQClient {
     }
 
     LaraMQClient(UUID clientId) throws IOException {
+        this(clientId, false);
+    }
+
+    LaraMQClient(UUID clientId, boolean clearSessionIfExists) throws IOException {
         this.clientId = Objects.requireNonNull(clientId, "clientId cannot be null");
+        this.clearSessionIfExists = clearSessionIfExists;
         socket = new Socket(Server.DOMAIN, Server.PORT);
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(socket.getOutputStream());
@@ -81,6 +86,7 @@ public class LaraMQClient {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         DataOutputStream payloadOut = new DataOutputStream(buf);
         payloadOut.writeUTF(clientId.toString());
+        payloadOut.writeBoolean(clearSessionIfExists);
         FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
     }
 
@@ -120,66 +126,106 @@ public class LaraMQClient {
 
         String command = parts[0].toLowerCase(Locale.ROOT);
 
-        switch (command) {
-            case "subscribe" -> {
-                if (parts.length < 2) {
-                    log(LogLevel.WARNING, "Usage: subscribe <topic>");
-                    return;
-                }
-                String topic = parts[1];
-                subscribeToTopic(topic);
-            }
-            case "unsubscribe" -> {
-                if (parts.length < 2) {
-                    log(LogLevel.WARNING, "Usage: unsubscribe <topic>");
-                    return;
-                }
-                String topic = parts[1];
-                unsubscribeFromTopic(topic);
-            }
-            case "publish" -> {
-                if (parts.length < 3) {
-                    log(LogLevel.WARNING, "Usage: publish <topic> <message> [retain]");
-                    return;
-                }
+        Consumer<String[]> handler = commandHandlers.get(command);
+        if (handler == null) {
+            log(LogLevel.WARNING, "Unknown command: " + command);
+            return;
+        }
 
-                boolean retain = parts[parts.length - 1].toLowerCase(Locale.ROOT).equalsIgnoreCase("retain");
+        handler.accept(parts);
+    }
 
-                String topic = parts[1];
-                String message = String.join(" ", java.util.Arrays.copyOfRange(parts, 2, parts.length - (retain ? 1 : 0)));
+    private Map<String, Consumer<String[]>> createCommandHandlers() {
+        Map<String, Consumer<String[]>> handlers = new HashMap<>();
+        handlers.put("subscribe", this::handleSubscribeCommand);
+        handlers.put("unsubscribe", this::handleUnsubscribeCommand);
+        handlers.put("publish", this::handlePublishCommand);
+        handlers.put("clear-retained", this::handleClearRetainedCommand);
+        handlers.put("help", ignored -> printHelp());
+        handlers.put("analytics", ignored -> getAndPrintAnalytics());
+        handlers.put("list", ignored -> listTopics());
+        handlers.put("exit", ignored -> handleExitCommand());
+        return Map.copyOf(handlers);
+    }
 
-                if (message.isEmpty()) {
-                    log(LogLevel.WARNING, "Message cannot be empty");
-                    return;
+    private void handleSubscribeCommand(String[] parts) {
+        if (parts.length < 2) {
+            log(LogLevel.WARNING, "Usage: subscribe <topic>");
+            return;
+        }
+
+        subscribeToTopic(parts[1]);
+    }
+
+    private void handleUnsubscribeCommand(String[] parts) {
+        if (parts.length < 2) {
+            log(LogLevel.WARNING, "Usage: unsubscribe <topic>");
+            return;
+        }
+
+        unsubscribeFromTopic(parts[1]);
+    }
+
+    private void handlePublishCommand(String[] parts) {
+        if (parts.length < 3) {
+            log(LogLevel.WARNING, "Usage: publish <topic> <message> [retain]");
+            return;
+        }
+
+        boolean retain = parts[parts.length - 1].toLowerCase(Locale.ROOT).equalsIgnoreCase("retain");
+        String topic = parts[1];
+        String message = String.join(" ", java.util.Arrays.copyOfRange(parts, 2, parts.length - (retain ? 1 : 0)));
+
+        if (message.isEmpty()) {
+            log(LogLevel.WARNING, "Message cannot be empty");
+            return;
+        }
+
+        publishToTopic(topic, message.getBytes(StandardCharsets.UTF_8), retain);
+    }
+
+    private void handleClearRetainedCommand(String[] parts) {
+        if (parts.length < 2) {
+            log(LogLevel.WARNING, "Usage: clear-retained <topic>");
+            return;
+        }
+
+        clearRetainedMessage(parts[1]);
+    }
+
+    private void handleExitCommand() {
+        log(LogLevel.INFO, "Exiting...");
+        close();
+        System.exit(0);
+    }
+
+    private void printHelp() {
+        log(LogLevel.INFO, "Available commands:");
+        log(LogLevel.INFO, "  subscribe <topic>          - Subscribe to a topic");
+        log(LogLevel.INFO, "  unsubscribe <topic>        - Unsubscribe from a topic");
+        log(LogLevel.INFO, "  publish <topic> <message> [retain] - Publish a message to a topic (use 'retain' to retain the message)");
+        log(LogLevel.INFO, "  clear-retained <topic>     - Clear the retained message for a topic");
+        log(LogLevel.INFO, "  analytics                  - Get analytics data");
+        log(LogLevel.INFO, "  exit                       - Exit the client");
+        log(LogLevel.INFO, "  help                       - Show this help message");
+    }
+
+    private void listTopics() {
+        try {
+            Frame response = callCommand(CommandCode.LIST.code, new byte[0]);
+            String topicsJson = new String(response.payload(), StandardCharsets.UTF_8);
+            String[] topics = MAPPER.readValue(topicsJson, String[].class);
+
+            if (topics.length == 0) {
+                log(LogLevel.INFO, "No topics available.");
+            } else {
+                log(LogLevel.INFO, "Available topics:");
+                for (String topic : topics) {
+                    log(LogLevel.INFO, "  - " + topic);
                 }
-
-                publishToTopic(topic, message.getBytes(StandardCharsets.UTF_8), retain);
             }
-            case "clear-retained" -> {
-                if (parts.length < 2) {
-                    log(LogLevel.WARNING, "Usage: clear-retained <topic>");
-                    return;
-                }
-                String topic = parts[1];
-                clearRetainedMessage(topic);
-            }
-            case "help" -> {
-                log(LogLevel.INFO, "Available commands:");
-                log(LogLevel.INFO, "  subscribe <topic>          - Subscribe to a topic");
-                log(LogLevel.INFO, "  unsubscribe <topic>        - Unsubscribe from a topic");
-                log(LogLevel.INFO, "  publish <topic> <message> [retain] - Publish a message to a topic (use 'retain' to retain the message)");
-                log(LogLevel.INFO, "  clear-retained <topic>     - Clear the retained message for a topic");
-                log(LogLevel.INFO, "  analytics                  - Get analytics data");
-                log(LogLevel.INFO, "  exit                       - Exit the client");
-                log(LogLevel.INFO, "  help                       - Show this help message");
-            }
-            case "exit" -> {
-                log(LogLevel.INFO, "Exiting...");
-                close();
-                System.exit(0);
-            }
-            case "analytics" -> getAndPrintAnalytics();
-            default -> log(LogLevel.WARNING, "Unknown command: " + command);
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            log(LogLevel.ERROR, "Error listing topics: " + e.getMessage());
         }
     }
 
@@ -313,11 +359,16 @@ public class LaraMQClient {
         }
     }
 
+    static void main(String[] args) throws IOException {
+        boolean clearSessionOnConnect = args != null
+                && java.util.Arrays.stream(args).anyMatch("--reset-session"::equalsIgnoreCase);
 
-    static void main() throws IOException {
         UUID clientId = loadOrCreateClientId();
-        LaraMQClient client = new LaraMQClient(clientId);
+        LaraMQClient client = new LaraMQClient(clientId, clearSessionOnConnect);
         client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
+        if (clearSessionOnConnect) {
+            client.log(LogLevel.INFO, "Requested session reset on connect");
+        }
         client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");
         client.startReader();
         client.startREPL();

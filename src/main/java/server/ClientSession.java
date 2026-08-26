@@ -60,6 +60,17 @@ public class ClientSession {
         }
     }
 
+    public void clearSessionData() {
+        synchronized (stateLock) {
+            boolean hadData = !subscribedTopics.isEmpty() || !undeliveredMessages.isEmpty();
+            subscribedTopics.clear();
+            undeliveredMessages.clear();
+            if (hadData) {
+                markDirty();
+            }
+        }
+    }
+
     public ClientSessionData toData() {
         Map<String, byte[][]> persistedMessages = new HashMap<>();
 

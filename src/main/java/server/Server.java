@@ -30,6 +30,9 @@ public class Server implements AutoCloseable {
     private final ClientSessionHandler clientSessionHandler = new ClientSessionHandler(ServerBootstrap.DEFAULT_CLIENT_SESSION_DATA_FILE_PATH);
     private final Broker broker = new Broker(new TopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService, clientSessionHandler);
 
+    private record AuthenticationRequest(UUID clientId, boolean clearSessionIfExists) {
+    }
+
     public Server(int port) throws IOException {
         this(DOMAIN, port);
     }
@@ -57,7 +60,7 @@ public class Server implements AutoCloseable {
         }
     }
 
-    private UUID authenticateClient(DataInputStream in) throws IOException, ProtocolException, AuthenticationException {
+    private AuthenticationRequest authenticateClient(DataInputStream in) throws IOException, ProtocolException, AuthenticationException {
         Frame frame = FrameReader.readFrame(in);
 
         if (frame.type() != MessageCode.AUTHENTICATE.code) {
@@ -66,8 +69,13 @@ public class Server implements AutoCloseable {
 
         DataInputStream authenticationPayload = new DataInputStream(new ByteArrayInputStream(frame.payload()));
         String clientIdString = authenticationPayload.readUTF();
+        boolean clearSessionIfExists = false;
+        if (authenticationPayload.available() > 0) {
+            clearSessionIfExists = authenticationPayload.readBoolean();
+        }
+
         try {
-            return UUID.fromString(clientIdString);
+            return new AuthenticationRequest(UUID.fromString(clientIdString), clearSessionIfExists);
         } catch (IllegalArgumentException e) {
             throw new AuthenticationException("Invalid UUID format: " + clientIdString);
         }
@@ -76,8 +84,17 @@ public class Server implements AutoCloseable {
     private void handleNewClient(Socket clientSocket) {
         try {
             DataInputStream in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-            UUID clientId = authenticateClient(in);
-            ClientSession session = clientSessionHandler.getOrCreate(clientId);
+            AuthenticationRequest authRequest = authenticateClient(in);
+            UUID clientId = authRequest.clientId();
+
+            ClientSession existingSession = clientSessionHandler.get(clientId.toString());
+            if (authRequest.clearSessionIfExists() && existingSession != null) {
+                broker.unsubscribeAll(clientId.toString());
+                existingSession.clearSessionData();
+                logger.info("Session reset for client (ID: %s) during authentication".formatted(clientId));
+            }
+
+            ClientSession session = existingSession != null ? existingSession : clientSessionHandler.getOrCreate(clientId);
 
             ClientConnection existingConnection = session.getClientConnection();
             if (existingConnection != null) {

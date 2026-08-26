@@ -7,9 +7,9 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Enhance client session management and topic subscription handling">
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Add session reset functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/LaraMQClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/broker/Broker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/broker/Broker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,61 +59,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
+      <entry key="MS100" value="5.933787651436146E-98" />
+      <entry key="MS500" value="3.586463374297894E-20" />
+      <entry key="S2" value="1.3761526159397123E-5" />
+      <entry key="S5" value="0.011362310156180552" />
+      <entry key="S10" value="0.10659413949485352" />
+      <entry key="S30" value="0.4779932685642296" />
+      <entry key="S60" value="0.839048728625694" />
+      <entry key="M2" value="1.777598975182562" />
+      <entry key="M5" value="3.794346305254684" />
+      <entry key="M10" value="5.116313853270156" />
+      <entry key="M15" value="5.767173406673405" />
+      <entry key="M30" value="9.086776401730758" />
+      <entry key="H1" value="31.155420997886914" />
+      <entry key="H2" value="98.4679334729525" />
+      <entry key="H4" value="219.7832677279243" />
+      <entry key="D1" value="880.3364076275482" />
+      <entry key="W1" value="1350.776151070693" />
+    </decayedCancelled>
+    <decayedSelected>
       <entry key="MS100" value="1.0" />
       <entry key="MS500" value="1.0" />
       <entry key="S2" value="1.0" />
       <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0" />
-      <entry key="S60" value="1.0" />
-      <entry key="M2" value="1.000000000000001" />
-      <entry key="M5" value="1.0000051043158733" />
-      <entry key="M10" value="1.0093878687925975" />
-      <entry key="M15" value="1.1318854951913344" />
-      <entry key="M30" value="4.180664758393357" />
-      <entry key="H1" value="27.159323373194354" />
-      <entry key="H2" value="95.66718527476547" />
-      <entry key="H4" value="217.3486103164411" />
-      <entry key="D1" value="876.7101923026655" />
-      <entry key="W1" value="1345.2961243087057" />
-    </decayedCancelled>
-    <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="1.0624547034717077E-267" />
-      <entry key="S10" value="3.259531720158139E-134" />
-      <entry key="S30" value="3.194368911857526E-45" />
-      <entry key="S60" value="5.651874837176102E-23" />
-      <entry key="M2" value="7.518497138770678E-12" />
-      <entry key="M5" value="3.855441691346544E-5" />
-      <entry key="M10" value="0.011710803509681136" />
-      <entry key="M15" value="0.10900842604145212" />
-      <entry key="M30" value="1.466895269027546" />
-      <entry key="H1" value="7.856794950213852" />
-      <entry key="H2" value="22.505646846256226" />
-      <entry key="H4" value="44.86054050831354" />
-      <entry key="D1" value="151.9030317186809" />
-      <entry key="W1" value="225.00160588143896" />
+      <entry key="S10" value="1.0000000007736525" />
+      <entry key="S30" value="1.0013288926459492" />
+      <entry key="S60" value="1.0508451032011314" />
+      <entry key="M2" value="1.3177602566525777" />
+      <entry key="M5" value="1.957401016998162" />
+      <entry key="M10" value="2.3914955145797268" />
+      <entry key="M15" value="2.648471030799926" />
+      <entry key="M30" value="4.057578101875034" />
+      <entry key="H1" value="10.245270941910134" />
+      <entry key="H2" value="24.728569646180027" />
+      <entry key="H4" value="47.11010494436796" />
+      <entry key="D1" value="154.48886798588657" />
+      <entry key="W1" value="227.9142183903735" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.5285090202806901" />
-      <entry key="MS500" value="0.880259013563151" />
-      <entry key="S2" value="0.9686181892266277" />
-      <entry key="S5" value="0.9873270783004776" />
-      <entry key="S10" value="0.99364333555883" />
-      <entry key="S30" value="0.997876606243217" />
-      <entry key="S60" value="0.9989377389223099" />
-      <entry key="M2" value="0.9994687283438329" />
-      <entry key="M5" value="0.9998309986274747" />
-      <entry key="M10" value="1.020965472227778" />
-      <entry key="M15" value="1.240620519790315" />
-      <entry key="M30" value="5.645605599574917" />
-      <entry key="H1" value="35.00937009579522" />
-      <entry key="H2" value="118.16189351330235" />
-      <entry key="H4" value="262.19739750522746" />
-      <entry key="D1" value="1028.605478153975" />
-      <entry key="W1" value="1570.296034041544" />
+      <entry key="MS100" value="2.488755939687394E-8" />
+      <entry key="MS500" value="0.030143693268254317" />
+      <entry key="S2" value="0.4166889418526198" />
+      <entry key="S5" value="0.7154395128827019" />
+      <entry key="S10" value="0.9436743046733931" />
+      <entry key="S30" value="1.4191271578124023" />
+      <entry key="S60" value="1.8573417459647876" />
+      <entry key="M2" value="3.0752325499440762" />
+      <entry key="M5" value="5.7402005995809615" />
+      <entry key="M10" value="7.500859300240116" />
+      <entry key="M15" value="8.410539322926809" />
+      <entry key="M30" value="13.140008834550907" />
+      <entry key="H1" value="41.39300259379587" />
+      <entry key="H2" value="123.18521777059392" />
+      <entry key="H4" value="266.8814571342286" />
+      <entry key="D1" value="1034.817491661181" />
+      <entry key="W1" value="1578.688665533668" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -306,7 +306,9 @@
     <MESSAGE value="feat: Implemented command handling and logging in the LaraMQ client" />
     <MESSAGE value="Update readme" />
     <MESSAGE value="feat: Enhance client session management and topic subscription handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Enhance client session management and topic subscription handling" />
+    <MESSAGE value="feat: Remove ClientSessionDataStore and refactor client ID loading" />
+    <MESSAGE value="feat: Add session reset functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add session reset functionality" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
