@@ -9,8 +9,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 public class AnalyticsCommand extends Command {
-    private final AnalyticsService analyticsService;
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final AnalyticsService analyticsService;
 
     public AnalyticsCommand(AnalyticsService analyticsService) {
         this.analyticsService = analyticsService;

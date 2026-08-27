@@ -18,6 +18,15 @@ import static org.mockito.Mockito.verify;
 
 class PublishCommandTest {
 
+    private static DataInputStream publishPayload(String topic, boolean retain, byte[] payload) throws Exception {
+        ByteArrayOutputStream raw = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(raw);
+        out.writeUTF(topic);
+        out.writeBoolean(retain);
+        out.write(payload);
+        return new DataInputStream(new ByteArrayInputStream(raw.toByteArray()));
+    }
+
     @Test
     void executePublishesPayloadAndRecordsAnalytics() throws Exception {
         Broker broker = mock(Broker.class);
@@ -34,15 +43,6 @@ class PublishCommandTest {
         verify(analyticsService).recordPublish("weather");
         assertEquals(0, response.length);
         assertArrayEquals(new byte[0], response);
-    }
-
-    private static DataInputStream publishPayload(String topic, boolean retain, byte[] payload) throws Exception {
-        ByteArrayOutputStream raw = new ByteArrayOutputStream();
-        DataOutputStream out = new DataOutputStream(raw);
-        out.writeUTF(topic);
-        out.writeBoolean(retain);
-        out.write(payload);
-        return new DataInputStream(new ByteArrayInputStream(raw.toByteArray()));
     }
 }
 

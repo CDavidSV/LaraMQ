@@ -13,10 +13,10 @@ import java.util.logging.Logger;
 
 public class TopicDataStore {
     private static final Logger logger = Logger.getLogger(TopicDataStore.class.getName());
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private final Map<String, TopicData> data = new ConcurrentHashMap<>();
     private final BlockingQueue<Boolean> queue = new LinkedBlockingQueue<>(1);
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private final Path file;
     private final Object ioLock = new Object();
     private volatile boolean closing;

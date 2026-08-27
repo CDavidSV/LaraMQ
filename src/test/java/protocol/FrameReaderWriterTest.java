@@ -2,19 +2,18 @@ package protocol;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FrameReaderWriterTest {
+
+    private static void writeHeader(DataOutputStream out, byte type, UUID id) throws IOException {
+        out.writeByte(type);
+        out.writeLong(id.getMostSignificantBits());
+        out.writeLong(id.getLeastSignificantBits());
+    }
 
     @Test
     void roundTripFramePreservesTypeIdAndPayload() throws IOException, ProtocolException {
@@ -89,12 +88,6 @@ class FrameReaderWriterTest {
         DataInputStream dataInput = new DataInputStream(new ByteArrayInputStream(output.toByteArray()));
 
         assertThrows(EOFException.class, () -> FrameReader.readFrame(dataInput));
-    }
-
-    private static void writeHeader(DataOutputStream out, byte type, UUID id) throws IOException {
-        out.writeByte(type);
-        out.writeLong(id.getMostSignificantBits());
-        out.writeLong(id.getLeastSignificantBits());
     }
 }
 

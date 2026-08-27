@@ -7,9 +7,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ClientSessionHandlerTest {
 
@@ -50,7 +48,7 @@ class ClientSessionHandlerTest {
             handler.getOrCreate(clientId);
             handler.remove(clientId.toString());
 
-            assertTrue(handler.get(clientId.toString()) == null);
+            assertNull(handler.get(clientId.toString()));
         } finally {
             handler.close();
         }

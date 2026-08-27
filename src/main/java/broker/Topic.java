@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Topic {
     private final String name;
-    private byte[] retainedMessage;
     private final Set<String> subscribers = ConcurrentHashMap.newKeySet();
+    private byte[] retainedMessage;
 
     public Topic(String name) {
         this.name = name;

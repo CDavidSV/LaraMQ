@@ -19,11 +19,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class BrokerTest {
 
@@ -33,6 +30,29 @@ class BrokerTest {
     private TopicDataStore topicDataStore;
     private ClientSessionHandler clientSessionHandler;
     private Broker broker;
+
+    private static boolean hasQueuedMessage(ClientSession session, String topic) {
+        Map<String, byte[][]> undelivered = session.toData().undeliveredMessages();
+        byte[][] messages = undelivered.get(topic);
+        return messages != null && messages.length > 0;
+    }
+
+    private static void waitForCondition(Check condition, long timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            if (condition.matches()) {
+                return;
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                fail("Interrupted while waiting for async broker work");
+            }
+        }
+
+        fail("Timed out waiting for async broker work");
+    }
 
     @BeforeEach
     void setUp() {
@@ -135,29 +155,6 @@ class BrokerTest {
         broker.unsubscribeAll(clientId.toString());
 
         assertEquals(0, broker.listTopics().length);
-    }
-
-    private static boolean hasQueuedMessage(ClientSession session, String topic) {
-        Map<String, byte[][]> undelivered = session.toData().undeliveredMessages();
-        byte[][] messages = undelivered.get(topic);
-        return messages != null && messages.length > 0;
-    }
-
-    private static void waitForCondition(Check condition, long timeoutMs) {
-        long deadline = System.currentTimeMillis() + timeoutMs;
-        while (System.currentTimeMillis() < deadline) {
-            if (condition.matches()) {
-                return;
-            }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                fail("Interrupted while waiting for async broker work");
-            }
-        }
-
-        fail("Timed out waiting for async broker work");
     }
 
     @FunctionalInterface

@@ -26,23 +26,13 @@ import java.util.function.Consumer;
 
 public class LaraMQClient {
     private static final Path DEFAULT_CLIENT_CONFIG_PATH = Path.of("data", "client_config.json");
-
-    enum LogLevel {
-        SUCCESS(GREEN, "✓"),
-        INFO(BLUE, "ℹ"),
-        WARNING(YELLOW, "⚠"),
-        ERROR(RED, "✗"),
-        NOTIFICATION(CYAN, "⟲");
-
-        final String color;
-        final String symbol;
-
-        LogLevel(String color, String symbol) {
-            this.color = color;
-            this.symbol = symbol;
-        }
-    }
-
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String RESET = "\u001B[0m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String RED = "\u001B[31m";
+    private static final String BLUE = "\u001B[34m";
     private final Socket socket;
     private final DataInputStream in;
     private final DataOutputStream out;
@@ -52,22 +42,6 @@ public class LaraMQClient {
     private final Terminal terminal = TerminalBuilder.builder().build();
     private final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
     private final Map<String, Consumer<String[]>> commandHandlers = createCommandHandlers();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private static final String RESET = "\u001B[0m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String CYAN = "\u001B[36m";
-    private static final String RED = "\u001B[31m";
-    private static final String BLUE = "\u001B[34m";
-
-    private record ClientConfig(String clientId) {
-    }
-
-    private void log(LogLevel level, String message) {
-        String formatted = String.format("%s%s %s%s%s", level.color, level.symbol, message, RESET, "");
-        reader.printAbove(formatted);
-    }
 
     LaraMQClient(UUID clientId) throws IOException {
         this(clientId, false);
@@ -80,14 +54,6 @@ public class LaraMQClient {
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(socket.getOutputStream());
         authenticate();
-    }
-
-    private void authenticate() throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        DataOutputStream payloadOut = new DataOutputStream(buf);
-        payloadOut.writeUTF(clientId.toString());
-        payloadOut.writeBoolean(clearSessionIfExists);
-        FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
     }
 
     static UUID loadOrCreateClientId() throws IOException {
@@ -117,6 +83,34 @@ public class LaraMQClient {
         Path tmpFile = configFile.resolveSibling(configFile.getFileName() + ".tmp");
         MAPPER.writerWithDefaultPrettyPrinter().writeValue(tmpFile.toFile(), new ClientConfig(clientId.toString()));
         Files.move(tmpFile, configFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+    }
+
+    static void main(String[] args) throws IOException {
+        boolean clearSessionOnConnect = args != null
+                && java.util.Arrays.stream(args).anyMatch("--reset-session"::equalsIgnoreCase);
+
+        UUID clientId = loadOrCreateClientId();
+        LaraMQClient client = new LaraMQClient(clientId, clearSessionOnConnect);
+        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
+        if (clearSessionOnConnect) {
+            client.log(LogLevel.INFO, "Requested session reset on connect");
+        }
+        client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");
+        client.startReader();
+        client.startREPL();
+    }
+
+    private void log(LogLevel level, String message) {
+        String formatted = String.format("%s%s %s%s%s", level.color, level.symbol, message, RESET, "");
+        reader.printAbove(formatted);
+    }
+
+    private void authenticate() throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        DataOutputStream payloadOut = new DataOutputStream(buf);
+        payloadOut.writeUTF(clientId.toString());
+        payloadOut.writeBoolean(clearSessionIfExists);
+        FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
     }
 
     private void handleCommand(String[] parts) {
@@ -359,18 +353,22 @@ public class LaraMQClient {
         }
     }
 
-    static void main(String[] args) throws IOException {
-        boolean clearSessionOnConnect = args != null
-                && java.util.Arrays.stream(args).anyMatch("--reset-session"::equalsIgnoreCase);
+    enum LogLevel {
+        SUCCESS(GREEN, "✓"),
+        INFO(BLUE, "ℹ"),
+        WARNING(YELLOW, "⚠"),
+        ERROR(RED, "✗"),
+        NOTIFICATION(CYAN, "⟲");
 
-        UUID clientId = loadOrCreateClientId();
-        LaraMQClient client = new LaraMQClient(clientId, clearSessionOnConnect);
-        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
-        if (clearSessionOnConnect) {
-            client.log(LogLevel.INFO, "Requested session reset on connect");
+        final String color;
+        final String symbol;
+
+        LogLevel(String color, String symbol) {
+            this.color = color;
+            this.symbol = symbol;
         }
-        client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");
-        client.startReader();
-        client.startREPL();
+    }
+
+    private record ClientConfig(String clientId) {
     }
 }

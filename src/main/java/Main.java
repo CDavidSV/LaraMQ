@@ -8,6 +8,16 @@ private static final String USAGE = """
           --port 3000
         """;
 
+private static boolean hasHelpFlag(String[] args) {
+    for (String arg : args) {
+        if ("-h".equals(arg) || "--help".equals(arg)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void main(String[] args) {
     if (hasHelpFlag(args)) {
         IO.print(USAGE);
@@ -33,16 +43,6 @@ void main(String[] args) {
         System.err.printf("Failed to start broker: %s%n", e.getMessage());
         System.exit(1);
     }
-}
-
-private static boolean hasHelpFlag(String[] args) {
-    for (String arg : args) {
-        if ("-h".equals(arg) || "--help".equals(arg)) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 private record BrokerConfig(String host, int port) {

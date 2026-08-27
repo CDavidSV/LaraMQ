@@ -4,11 +4,7 @@ import command.CommandCode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import protocol.Frame;
-import protocol.FrameReader;
-import protocol.FrameWriter;
-import protocol.MessageCode;
-import protocol.ProtocolException;
+import protocol.*;
 import server.Server;
 
 import java.io.*;
@@ -20,9 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ServerE2ETest {
 
@@ -38,6 +32,38 @@ class ServerE2ETest {
     private Server server;
     private Thread serverThread;
     private int port;
+
+    private static void sendSubscribe(DataOutputStream out, String topic) throws IOException {
+        sendCommand(out, CommandCode.SUBSCRIBE.code, topic.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static void sendPublish(DataOutputStream out, String topic, boolean retain, byte[] payload) throws IOException {
+        ByteArrayOutputStream commandPayloadBuffer = new ByteArrayOutputStream();
+        DataOutputStream commandPayloadOut = new DataOutputStream(commandPayloadBuffer);
+        commandPayloadOut.writeUTF(topic);
+        commandPayloadOut.writeBoolean(retain);
+        commandPayloadOut.write(payload);
+
+        sendCommand(out, CommandCode.PUBLISH.code, commandPayloadBuffer.toByteArray());
+    }
+
+    private static void sendCommand(DataOutputStream out, byte commandCode, byte[] commandPayload) throws IOException {
+        ByteArrayOutputStream framePayloadBuffer = new ByteArrayOutputStream();
+        framePayloadBuffer.write(commandCode);
+        framePayloadBuffer.write(commandPayload);
+
+        FrameWriter.writeFrame(out, MessageCode.COMMAND.code, UUID.randomUUID(), framePayloadBuffer.toByteArray());
+    }
+
+    private static Frame readFrame(DataInputStream in) throws IOException, ProtocolException {
+        return FrameReader.readFrame(in);
+    }
+
+    private static int findFreePort() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0, 50, InetAddress.getByName(HOST))) {
+            return socket.getLocalPort();
+        }
+    }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -132,32 +158,6 @@ class ServerE2ETest {
         return new ClientSession(socket, in, out);
     }
 
-    private static void sendSubscribe(DataOutputStream out, String topic) throws IOException {
-        sendCommand(out, CommandCode.SUBSCRIBE.code, topic.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static void sendPublish(DataOutputStream out, String topic, boolean retain, byte[] payload) throws IOException {
-        ByteArrayOutputStream commandPayloadBuffer = new ByteArrayOutputStream();
-        DataOutputStream commandPayloadOut = new DataOutputStream(commandPayloadBuffer);
-        commandPayloadOut.writeUTF(topic);
-        commandPayloadOut.writeBoolean(retain);
-        commandPayloadOut.write(payload);
-
-        sendCommand(out, CommandCode.PUBLISH.code, commandPayloadBuffer.toByteArray());
-    }
-
-    private static void sendCommand(DataOutputStream out, byte commandCode, byte[] commandPayload) throws IOException {
-        ByteArrayOutputStream framePayloadBuffer = new ByteArrayOutputStream();
-        framePayloadBuffer.write(commandCode);
-        framePayloadBuffer.write(commandPayload);
-
-        FrameWriter.writeFrame(out, MessageCode.COMMAND.code, UUID.randomUUID(), framePayloadBuffer.toByteArray());
-    }
-
-    private static Frame readFrame(DataInputStream in) throws IOException, ProtocolException {
-        return FrameReader.readFrame(in);
-    }
-
     private void waitForServerReady() throws Exception {
         long deadline = System.currentTimeMillis() + 3000;
 
@@ -175,13 +175,7 @@ class ServerE2ETest {
             }
         }
 
-        assertTrue(false, "Server did not become ready in time");
-    }
-
-    private static int findFreePort() throws IOException {
-        try (ServerSocket socket = new ServerSocket(0, 50, InetAddress.getByName(HOST))) {
-            return socket.getLocalPort();
-        }
+        fail("Server did not become ready in time");
     }
 
     private void backupAndResetDataFiles() throws IOException {

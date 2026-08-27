@@ -17,21 +17,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server implements AutoCloseable {
-    private static final Logger logger = Logger.getLogger(Server.class.getName());
     public static final String DOMAIN = "127.0.0.1";
     public static final int PORT = 3000;
-
+    private static final Logger logger = Logger.getLogger(Server.class.getName());
     private final String host;
     private final ServerSocket server;
     private final ExecutorService executor;
-    private volatile boolean running = true;
     private final CommandRegistry commandRegistry;
     private final AnalyticsService analyticsService = new AnalyticsService();
     private final ClientSessionHandler clientSessionHandler = new ClientSessionHandler(ServerBootstrap.DEFAULT_CLIENT_SESSION_DATA_FILE_PATH);
     private final Broker broker = new Broker(new TopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService, clientSessionHandler);
-
-    private record AuthenticationRequest(UUID clientId, boolean clearSessionIfExists) {
-    }
+    private volatile boolean running = true;
 
     public Server(int port) throws IOException {
         this(DOMAIN, port);
@@ -43,6 +39,12 @@ public class Server implements AutoCloseable {
         executor = Executors.newVirtualThreadPerTaskExecutor();
 
         commandRegistry = ServerBootstrap.buildRegistry(broker, analyticsService);
+    }
+
+    static void main() throws IOException {
+        try (Server server = new Server(Server.PORT)) {
+            server.start();
+        }
     }
 
     public void start() {
@@ -145,9 +147,6 @@ public class Server implements AutoCloseable {
         }
     }
 
-    static void main() throws IOException {
-        try (Server server = new Server(Server.PORT)) {
-            server.start();
-        }
+    private record AuthenticationRequest(UUID clientId, boolean clearSessionIfExists) {
     }
 }

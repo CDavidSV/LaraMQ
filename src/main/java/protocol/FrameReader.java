@@ -11,7 +11,7 @@ public class FrameReader {
         byte type = in.readByte();
         long msb = in.readLong();
         long lsb = in.readLong();
-        UUID id = new UUID(msb,lsb);
+        UUID id = new UUID(msb, lsb);
 
         int length = in.readInt();
         if (length < 0 || length > MAX_PAYLOAD_SIZE) {

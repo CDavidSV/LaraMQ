@@ -37,9 +37,6 @@ public class ClientConnection implements AutoCloseable {
         outboundWriter = Thread.startVirtualThread(this::runOutboundWriter);
     }
 
-    private record OutboundFrame(byte type, UUID id, byte[] payload) {
-    }
-
     private void runOutboundWriter() {
         while (!closed) {
             try {
@@ -124,5 +121,8 @@ public class ClientConnection implements AutoCloseable {
         } catch (IOException e) {
             logger.log(Level.WARNING, e.getMessage());
         }
+    }
+
+    private record OutboundFrame(byte type, UUID id, byte[] payload) {
     }
 }

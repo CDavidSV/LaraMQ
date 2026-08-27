@@ -13,8 +13,8 @@ public class ClientSession {
     private final Set<String> subscribedTopics = ConcurrentHashMap.newKeySet();
     private final Map<String, ConcurrentLinkedQueue<byte[]>> undeliveredMessages = new ConcurrentHashMap<>();
     private final Runnable dirtyCallback;
-    private ClientConnection clientConnection;
     private final Object stateLock = new Object();
+    private ClientConnection clientConnection;
 
     public ClientSession(UUID clientId, Runnable dirtyCallback) {
         this.clientId = clientId;
