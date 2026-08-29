@@ -22,16 +22,18 @@ public class ClientConnection implements AutoCloseable {
     private final DataOutputStream out;
     private final CommandRegistry cmdRegistry;
     private final AnalyticsService analyticsService;
+    private final ClientSession session;
     private final BlockingQueue<OutboundFrame> outboundQueue = new ArrayBlockingQueue<>(OUTBOUND_QUEUE_CAPACITY);
     private final Thread outboundWriter;
     private volatile boolean closed;
 
-    ClientConnection(Socket socket, DataInputStream in, CommandRegistry cmdRegistry, AnalyticsService analyticsService, UUID id) throws IOException, AuthenticationException, ProtocolException {
+    ClientConnection(Socket socket, DataInputStream in, CommandRegistry cmdRegistry, AnalyticsService analyticsService, UUID id, ClientSession session) throws IOException, AuthenticationException, ProtocolException {
         this.socket = socket;
         this.cmdRegistry = cmdRegistry;
         this.analyticsService = analyticsService;
         this.in = in;
         this.id = id;
+        this.session = session;
         out = new DataOutputStream(socket.getOutputStream());
 
         outboundWriter = Thread.startVirtualThread(this::runOutboundWriter);
@@ -42,7 +44,7 @@ public class ClientConnection implements AutoCloseable {
             try {
                 OutboundFrame frame = outboundQueue.take();
                 synchronized (out) {
-                    FrameWriter.writeFrame(out, frame.type(), frame.id(), frame.payload());
+                    FrameWriter.writeFrame(out, frame.type(), frame.id(), frame.wirePayload());
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -100,12 +102,11 @@ public class ClientConnection implements AutoCloseable {
     }
 
     public void sendMessage(String topic, byte[] payload) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(buf);
-        dos.writeUTF(topic);
-        dos.write(payload);
-
-        enqueueOutbound(new OutboundFrame(MessageCode.NOTIFICATION.code, UUID.randomUUID(), buf.toByteArray()));
+        try {
+            enqueueOutbound(new OutboundFrame(MessageCode.NOTIFICATION.code, UUID.randomUUID(), topic, payload.clone()));
+        } catch (IOException e) {
+            session.enqueueUndeliveredMessage(topic, payload);
+        }
     }
 
     public UUID getId() {
@@ -116,6 +117,14 @@ public class ClientConnection implements AutoCloseable {
     public void close() {
         closed = true;
         outboundWriter.interrupt();
+
+        OutboundFrame frame;
+        while ((frame = outboundQueue.poll()) != null) {
+            if (frame.type() == MessageCode.NOTIFICATION.code) {
+                session.enqueueUndeliveredMessage(frame.topic(), frame.message());
+            }
+        }
+
         try {
             socket.close();
         } catch (IOException e) {
@@ -123,6 +132,24 @@ public class ClientConnection implements AutoCloseable {
         }
     }
 
-    private record OutboundFrame(byte type, UUID id, byte[] payload) {
+    private record OutboundFrame(byte type, UUID id, byte[] payload, String topic, byte[] message) {
+        OutboundFrame(byte type, UUID id, byte[] payload) {
+            this(type, id, payload, null, null);
+        }
+
+        OutboundFrame(byte type, UUID id, String topic, byte[] message) {
+            this(type, id, null, topic, message);
+        }
+
+        byte[] wirePayload() throws IOException {
+            if (topic != null) {
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(buf);
+                dos.writeUTF(topic);
+                dos.write(message);
+                return buf.toByteArray();
+            }
+            return payload;
+        }
     }
 }

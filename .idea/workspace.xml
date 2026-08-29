@@ -7,9 +7,10 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="test: Add unit tests">
+    <list default="true" id="981b410b-7172-4631-9c15-92853e356dc4" name="Changes" comment="feat: Add analytics service for tracking client interactions and command usage">
       <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ClientConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Server.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,15 +25,16 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="29" />
+    <option name="cachedIndexableFilesCount" value="69" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Record" />
         <option value="Exception" />
         <option value="Class" />
+        <option value="Record" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -48,73 +50,78 @@
     &quot;assignee&quot;: &quot;CDavidSV&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/CDavidSV/LaraMQ&quot;,
-    &quot;accountId&quot;: &quot;1eda2802-0fdf-45e0-a983-3bdbc73e6373&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/CDavidSV/LaraMQ",
+    "accountId": "1eda2802-0fdf-45e0-a983-3bdbc73e6373"
   }
-}</component>
+}]]></component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.326620691361537E-4" />
-      <entry key="MS500" value="0.21461837088564367" />
-      <entry key="S2" value="2.1388782172376546" />
-      <entry key="S5" value="3.922341379009377" />
-      <entry key="S10" value="4.917560525474358" />
-      <entry key="S30" value="6.017539815464196" />
-      <entry key="S60" value="6.588047450101499" />
-      <entry key="M2" value="7.629561017396092" />
-      <entry key="M5" value="9.716355835560758" />
-      <entry key="M10" value="11.071188671849743" />
-      <entry key="M15" value="11.735082034561465" />
-      <entry key="M30" value="15.065649464208908" />
-      <entry key="H1" value="37.127995388013325" />
-      <entry key="H2" value="104.42850307535276" />
-      <entry key="H4" value="225.7403757360225" />
-      <entry key="D1" value="886.3082257608577" />
-      <entry key="W1" value="1356.7699851135756" />
+      <entry key="MS100" value="1.0001237743505602" />
+      <entry key="MS500" value="1.1653964299885193" />
+      <entry key="S2" value="1.6384173408997056" />
+      <entry key="S5" value="1.9963993250277001" />
+      <entry key="S10" value="3.0741203188850537" />
+      <entry key="S30" value="6.922432986748044" />
+      <entry key="S60" value="9.318870728815305" />
+      <entry key="M2" value="11.275293514046679" />
+      <entry key="M5" value="15.008882413414511" />
+      <entry key="M10" value="20.314915723083143" />
+      <entry key="M15" value="26.685567139270336" />
+      <entry key="M30" value="46.31917540189544" />
+      <entry key="H1" value="72.02629182675962" />
+      <entry key="H2" value="95.6960223780542" />
+      <entry key="H4" value="133.6148474683048" />
+      <entry key="D1" value="632.4477079412216" />
+      <entry key="W1" value="1062.6866180382644" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0000000000011275" />
-      <entry key="MS500" value="1.0040777809664911" />
-      <entry key="S2" value="1.2527004257409233" />
-      <entry key="S5" value="1.5768227616017203" />
-      <entry key="S10" value="1.7594884874007244" />
-      <entry key="S30" value="1.9135881950321525" />
-      <entry key="S60" value="2.003750028468196" />
-      <entry key="M2" value="2.2878931641900806" />
-      <entry key="M5" value="2.939533042531684" />
-      <entry key="M10" value="3.3805552051894097" />
-      <entry key="M15" value="3.6403876009192055" />
-      <entry key="M30" value="5.051381278760348" />
-      <entry key="H1" value="11.237444550298898" />
-      <entry key="H2" value="25.71912272936191" />
-      <entry key="H4" value="48.10110548015053" />
-      <entry key="D1" value="155.48394891485185" />
-      <entry key="W1" value="228.91318166146408" />
+      <entry key="MS100" value="2.7453561668973118E-14" />
+      <entry key="MS500" value="0.0019396337801504606" />
+      <entry key="S2" value="0.20986344034499602" />
+      <entry key="S5" value="0.5419425845012413" />
+      <entry key="S10" value="0.8119588359894994" />
+      <entry key="S30" value="1.3323513561325224" />
+      <entry key="S60" value="1.6126783664835058" />
+      <entry key="M2" value="1.9428351244639883" />
+      <entry key="M5" value="2.996359154600068" />
+      <entry key="M10" value="4.083415003238965" />
+      <entry key="M15" value="4.761700863590267" />
+      <entry key="M30" value="6.159366087987873" />
+      <entry key="H1" value="7.736770257134851" />
+      <entry key="H2" value="9.306822721006002" />
+      <entry key="H4" value="14.263312125185115" />
+      <entry key="D1" value="92.55417934424563" />
+      <entry key="W1" value="159.0935932911376" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.0018530606567846088" />
-      <entry key="MS500" value="0.48653876474312785" />
-      <entry key="S2" value="2.9273907113125217" />
-      <entry key="S5" value="5.175523737748034" />
-      <entry key="S10" value="6.470961559658549" />
-      <entry key="S30" value="7.8472613242234095" />
-      <entry key="S60" value="8.54603079369143" />
-      <entry key="M2" value="9.890395780571373" />
-      <entry key="M5" value="12.641479984370042" />
-      <entry key="M10" value="14.443339735111978" />
-      <entry key="M15" value="15.369389059831542" />
-      <entry key="M30" value="20.112195957547538" />
-      <entry key="H1" value="48.35750853161691" />
-      <entry key="H2" value="130.1362207856399" />
-      <entry key="H4" value="273.8295059598042" />
-      <entry key="D1" value="1041.784380638378" />
-      <entry key="W1" value="1585.681461379247" />
+      <entry key="MS100" value="0.041810236621970365" />
+      <entry key="MS500" value="0.5440604478847909" />
+      <entry key="S2" value="1.2975551998873462" />
+      <entry key="S5" value="2.146464257975007" />
+      <entry key="S10" value="3.604213783670316" />
+      <entry key="S30" value="8.088766149463565" />
+      <entry key="S60" value="10.826563399298172" />
+      <entry key="M2" value="13.155113225567664" />
+      <entry key="M5" value="17.969091829493653" />
+      <entry key="M10" value="24.3745752789429" />
+      <entry key="M15" value="31.42905587376" />
+      <entry key="M30" value="52.466814058688215" />
+      <entry key="H1" value="79.75555183580457" />
+      <entry key="H2" value="104.99818563909042" />
+      <entry key="H4" value="147.87417219516834" />
+      <entry key="D1" value="724.9966984199734" />
+      <entry key="W1" value="1221.7789193029423" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -148,41 +155,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.LaraMQClient.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.MultiPublisherClient.executor": "Run",
-    "Application.Server.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.jshint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.jshint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.sourceCode.JAVA"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.LaraMQClient.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Server.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\GitHub\LaraMQ\content\images" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Application.Server">
+}</component>
+  <component name="RunManager" selected="Application.LaraMQClient">
     <configuration name="LaraMQClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="client.LaraMQClient" />
       <module name="LaraMQ" />
@@ -196,15 +195,9 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MultiPublisherClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="client.MultiPublisherClient" />
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="LaraMQ" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="client.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -224,17 +217,17 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Server" />
         <item itemvalue="Application.LaraMQClient" />
-        <item itemvalue="Application.MultiPublisherClient" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Server" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-34e2839f716b-intellij.indexing.shared.core-IU-262.9437.185" />
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.9437.185" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.27258.48" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.27258.48" />
       </set>
     </attachedChunks>
   </component>
@@ -303,14 +296,7 @@
     <MESSAGE value="feat: Enhance broker functionality with topic management and persistent storage" />
     <MESSAGE value="chore: Update .gitignore to include data files" />
     <MESSAGE value="feat: Add analytics service for tracking client interactions and command usage" />
-    <MESSAGE value="refactor: Simplify lambda expressions in analytics service methods" />
-    <MESSAGE value="feat: Implemented command handling and logging in the LaraMQ client" />
-    <MESSAGE value="Update readme" />
-    <MESSAGE value="feat: Enhance client session management and topic subscription handling" />
-    <MESSAGE value="feat: Remove ClientSessionDataStore and refactor client ID loading" />
-    <MESSAGE value="feat: Add session reset functionality" />
-    <MESSAGE value="test: Add unit tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="test: Add unit tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Add analytics service for tracking client interactions and command usage" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

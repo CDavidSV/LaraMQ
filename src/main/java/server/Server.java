@@ -104,7 +104,7 @@ public class Server implements AutoCloseable {
                 existingConnection.close();
             }
 
-            ClientConnection clientConn = new ClientConnection(clientSocket, in, commandRegistry, analyticsService, clientId);
+            ClientConnection clientConn = new ClientConnection(clientSocket, in, commandRegistry, analyticsService, clientId, session);
             session.setClientConnection(clientConn);
             analyticsService.recordClientConnected();
             logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
