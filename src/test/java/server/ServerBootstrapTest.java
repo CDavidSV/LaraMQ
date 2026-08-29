@@ -19,20 +19,17 @@ class ServerBootstrapTest {
     Path tempDir;
 
     private TopicDataStore topicDataStore;
-    private ClientSessionHandler clientSessionHandler;
     private Broker broker;
 
     @BeforeEach
     void setUp() {
         topicDataStore = new TopicDataStore(tempDir.resolve("topic_data.json"));
-        clientSessionHandler = new ClientSessionHandler(tempDir.resolve("client_sessions.json"));
-        broker = new Broker(topicDataStore, new AnalyticsService(), clientSessionHandler);
+        broker = new Broker(topicDataStore, new AnalyticsService(), ignored -> null);
     }
 
     @AfterEach
     void tearDown() {
         broker.shutdown();
-        clientSessionHandler.close();
     }
 
     @Test
@@ -47,4 +44,5 @@ class ServerBootstrapTest {
         assertInstanceOf(AnalyticsCommand.class, registry.get(CommandCode.ANALYTICS));
     }
 }
+
 

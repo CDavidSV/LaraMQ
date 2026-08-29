@@ -3,13 +3,12 @@ package broker;
 import broker.store.TopicData;
 import broker.store.TopicDataStore;
 import server.ClientConnection;
-import server.ClientSession;
-import server.ClientSessionHandler;
 import services.analytics.AnalyticsService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -19,12 +18,12 @@ public class Broker {
     private final TopicDataStore topicDataStore;
     private final Object topicLock = new Object();
     private final AnalyticsService analyticsService;
-    private final ClientSessionHandler clientSessionHandler;
+    private final Function<String, ClientConnection> clientConnectionLookup;
 
-    public Broker(TopicDataStore topicDataStore, AnalyticsService analyticsService, ClientSessionHandler clientSessionHandler) {
+    public Broker(TopicDataStore topicDataStore, AnalyticsService analyticsService, Function<String, ClientConnection> clientConnectionLookup) {
         this.topicDataStore = topicDataStore;
         this.analyticsService = analyticsService;
-        this.clientSessionHandler = clientSessionHandler;
+        this.clientConnectionLookup = clientConnectionLookup;
 
         boolean loadedData = false;
         for (TopicData topicData : topicDataStore.getAll()) {
@@ -48,11 +47,6 @@ public class Broker {
             Topic t = topics.computeIfAbsent(topic, Topic::new);
             t.addSubscriber(clientId);
 
-            ClientSession clientSession = clientSessionHandler.get(clientId);
-            if (clientSession != null) {
-                clientSession.subscribeTopic(topic);
-            }
-
             topicDataStore.save(new TopicData(topic, t.getRetainedMessage(), t.getSubscribers().toArray(new String[0])));
 
             return t;
@@ -67,11 +61,6 @@ public class Broker {
             }
 
             topicObj.removeSubscriber(clientId);
-
-            ClientSession clientSession = clientSessionHandler.get(clientId);
-            if (clientSession != null) {
-                clientSession.unsubscribeTopic(topic);
-            }
 
             topicDataStore.save(new TopicData(topic, topicObj.getRetainedMessage(), topicObj.getSubscribers().toArray(new String[0])));
 
@@ -126,22 +115,15 @@ public class Broker {
 
     private void broadcast(String topic, byte[] payload, List<String> subscribers) {
         for (String clientId : subscribers) {
+            ClientConnection connection = clientConnectionLookup.apply(clientId);
+            if (connection == null) {
+                continue;
+            }
+
             try {
-                ClientSession session = clientSessionHandler.get(clientId);
-                if (session != null) {
-                    ClientConnection connection = session.getClientConnection();
-                    if (connection != null) {
-                        connection.sendMessage(topic, payload);
-                        analyticsService.recordNotification();
-                    } else {
-                        session.enqueueUndeliveredMessage(topic, payload);
-                    }
-                }
+                connection.sendMessage(topic, payload);
+                analyticsService.recordNotification();
             } catch (IOException e) {
-                ClientSession session = clientSessionHandler.get(clientId);
-                if (session != null) {
-                    session.enqueueUndeliveredMessage(topic, payload);
-                }
                 logger.warning("failed to send notification to client (ID: %s): %s".formatted(clientId, e.getMessage()));
             }
         }

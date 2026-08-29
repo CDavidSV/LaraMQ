@@ -22,8 +22,7 @@ class ServerE2ETest {
 
     private static final String HOST = "127.0.0.1";
     private static final List<Path> PERSISTED_DATA_FILES = List.of(
-            Path.of("data", "topic_data.json"),
-            Path.of("data", "client_sessions.json")
+            Path.of("data", "topic_data.json")
     );
 
     private final Map<Path, byte[]> backup = new HashMap<>();
@@ -91,13 +90,11 @@ class ServerE2ETest {
 
     @Test
     void publishAfterSubscribeDeliversNotificationToSubscriber() throws Exception {
-        UUID subscriberId = UUID.randomUUID();
-        UUID publisherId = UUID.randomUUID();
         String topic = "e2e/weather/" + UUID.randomUUID();
         byte[] payload = "sunny".getBytes(StandardCharsets.UTF_8);
 
-        try (ClientSession subscriber = connectClient(subscriberId, false);
-             ClientSession publisher = connectClient(publisherId, false)) {
+        try (TestClient subscriber = connectClient();
+             TestClient publisher = connectClient()) {
 
             sendSubscribe(subscriber.out(), topic);
             Frame subscribeAck = readFrame(subscriber.in());
@@ -121,18 +118,16 @@ class ServerE2ETest {
 
     @Test
     void retainedMessageIsReturnedInSubscribeAck() throws Exception {
-        UUID publisherId = UUID.randomUUID();
-        UUID subscriberId = UUID.randomUUID();
         String topic = "e2e/retain/" + UUID.randomUUID();
         byte[] retained = "retained-message".getBytes(StandardCharsets.UTF_8);
 
-        try (ClientSession publisher = connectClient(publisherId, false)) {
+        try (TestClient publisher = connectClient()) {
             sendPublish(publisher.out(), topic, true, retained);
             Frame publishAck = readFrame(publisher.in());
             assertEquals(MessageCode.ACK.code, publishAck.type());
         }
 
-        try (ClientSession subscriber = connectClient(subscriberId, false)) {
+        try (TestClient subscriber = connectClient()) {
             sendSubscribe(subscriber.out(), topic);
             Frame subscribeAck = readFrame(subscriber.in());
 
@@ -141,21 +136,14 @@ class ServerE2ETest {
         }
     }
 
-    private ClientSession connectClient(UUID clientId, boolean clearSessionIfExists) throws IOException {
+    private TestClient connectClient() throws IOException {
         Socket socket = new Socket(HOST, port);
         socket.setSoTimeout(3000);
 
         DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
-        ByteArrayOutputStream authPayloadBuffer = new ByteArrayOutputStream();
-        DataOutputStream authPayloadOut = new DataOutputStream(authPayloadBuffer);
-        authPayloadOut.writeUTF(clientId.toString());
-        authPayloadOut.writeBoolean(clearSessionIfExists);
-
-        FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), authPayloadBuffer.toByteArray());
-
-        return new ClientSession(socket, in, out);
+        return new TestClient(socket, in, out);
     }
 
     private void waitForServerReady() throws Exception {
@@ -163,13 +151,9 @@ class ServerE2ETest {
 
         while (System.currentTimeMillis() < deadline) {
             try (Socket probe = new Socket(HOST, port)) {
-                DataOutputStream out = new DataOutputStream(probe.getOutputStream());
-                ByteArrayOutputStream authPayloadBuffer = new ByteArrayOutputStream();
-                DataOutputStream authPayloadOut = new DataOutputStream(authPayloadBuffer);
-                authPayloadOut.writeUTF(UUID.randomUUID().toString());
-                authPayloadOut.writeBoolean(false);
-                FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), authPayloadBuffer.toByteArray());
-                return;
+                if (probe.isConnected()) {
+                    return;
+                }
             } catch (IOException ignored) {
                 Thread.sleep(25);
             }
@@ -208,12 +192,10 @@ class ServerE2ETest {
         }
     }
 
-    private record ClientSession(Socket socket, DataInputStream in, DataOutputStream out) implements AutoCloseable {
+    private record TestClient(Socket socket, DataInputStream in, DataOutputStream out) implements AutoCloseable {
         @Override
         public void close() throws IOException {
             socket.close();
         }
     }
 }
-
-
