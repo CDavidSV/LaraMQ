@@ -15,6 +15,9 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class LaraMQClient {
+    private static final Path DEFAULT_CLIENT_CONFIG_PATH = Path.of("data", "client_config.json");
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String RESET = "\u001B[0m";
     private static final String GREEN = "\u001B[32m";
@@ -32,20 +36,65 @@ public class LaraMQClient {
     private final Socket socket;
     private final DataInputStream in;
     private final DataOutputStream out;
+    private final UUID clientId;
+    private final boolean clearSessionIfExists;
     private final Map<String, CompletableFuture<Frame>> pending = new ConcurrentHashMap<>();
     private final Terminal terminal = TerminalBuilder.builder().build();
     private final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
     private final Map<String, Consumer<String[]>> commandHandlers = createCommandHandlers();
 
-    LaraMQClient() throws IOException {
+    LaraMQClient(UUID clientId) throws IOException {
+        this(clientId, false);
+    }
+
+    LaraMQClient(UUID clientId, boolean clearSessionIfExists) throws IOException {
+        this.clientId = Objects.requireNonNull(clientId, "clientId cannot be null");
+        this.clearSessionIfExists = clearSessionIfExists;
         socket = new Socket(Server.DOMAIN, Server.PORT);
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(socket.getOutputStream());
+        authenticate();
+    }
+
+    static UUID loadOrCreateClientId() throws IOException {
+        Path normalizedConfigFile = LaraMQClient.DEFAULT_CLIENT_CONFIG_PATH.toAbsolutePath().normalize();
+        Path parent = normalizedConfigFile.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+
+        if (Files.exists(normalizedConfigFile) && Files.size(normalizedConfigFile) > 0L) {
+            try {
+                ClientConfig config = MAPPER.readValue(normalizedConfigFile.toFile(), ClientConfig.class);
+                if (config != null && config.clientId() != null && !config.clientId().isBlank()) {
+                    return UUID.fromString(config.clientId());
+                }
+            } catch (JsonProcessingException | IllegalArgumentException e) {
+                // Regenerate and overwrite invalid config content.
+            }
+        }
+
+        UUID generatedClientId = UUID.randomUUID();
+        writeClientConfig(normalizedConfigFile, generatedClientId);
+        return generatedClientId;
+    }
+
+    private static void writeClientConfig(Path configFile, UUID clientId) throws IOException {
+        Path tmpFile = configFile.resolveSibling(configFile.getFileName() + ".tmp");
+        MAPPER.writerWithDefaultPrettyPrinter().writeValue(tmpFile.toFile(), new ClientConfig(clientId.toString()));
+        Files.move(tmpFile, configFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 
     static void main(String[] args) throws IOException {
-        LaraMQClient client = new LaraMQClient();
-        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker");
+        boolean clearSessionOnConnect = args != null
+                && java.util.Arrays.stream(args).anyMatch("--reset-session"::equalsIgnoreCase);
+
+        UUID clientId = loadOrCreateClientId();
+        LaraMQClient client = new LaraMQClient(clientId, clearSessionOnConnect);
+        client.log(LogLevel.SUCCESS, "Connected to LaraMQ broker as client [" + clientId + "]");
+        if (clearSessionOnConnect) {
+            client.log(LogLevel.INFO, "Requested session reset on connect");
+        }
         client.log(LogLevel.INFO, "Type 'help' for available commands or start typing commands");
         client.startReader();
         client.startREPL();
@@ -54,6 +103,14 @@ public class LaraMQClient {
     private void log(LogLevel level, String message) {
         String formatted = String.format("%s%s %s%s%s", level.color, level.symbol, message, RESET, "");
         reader.printAbove(formatted);
+    }
+
+    private void authenticate() throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        DataOutputStream payloadOut = new DataOutputStream(buf);
+        payloadOut.writeUTF(clientId.toString());
+        payloadOut.writeBoolean(clearSessionIfExists);
+        FrameWriter.writeFrame(out, MessageCode.AUTHENTICATE.code, UUID.randomUUID(), buf.toByteArray());
     }
 
     private void handleCommand(String[] parts) {
@@ -310,5 +367,8 @@ public class LaraMQClient {
             this.color = color;
             this.symbol = symbol;
         }
+    }
+
+    private record ClientConfig(String clientId) {
     }
 }

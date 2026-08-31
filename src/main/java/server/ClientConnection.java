@@ -22,16 +22,18 @@ public class ClientConnection implements AutoCloseable {
     private final DataOutputStream out;
     private final CommandRegistry cmdRegistry;
     private final AnalyticsService analyticsService;
+    private final ClientSession session;
     private final BlockingQueue<OutboundFrame> outboundQueue = new ArrayBlockingQueue<>(OUTBOUND_QUEUE_CAPACITY);
     private final Thread outboundWriter;
     private volatile boolean closed;
 
-    ClientConnection(Socket socket, DataInputStream in, CommandRegistry cmdRegistry, AnalyticsService analyticsService, UUID id) throws IOException {
+    ClientConnection(Socket socket, DataInputStream in, CommandRegistry cmdRegistry, AnalyticsService analyticsService, UUID id, ClientSession session) throws IOException, AuthenticationException, ProtocolException {
         this.socket = socket;
         this.cmdRegistry = cmdRegistry;
         this.analyticsService = analyticsService;
         this.in = in;
         this.id = id;
+        this.session = session;
         out = new DataOutputStream(socket.getOutputStream());
 
         outboundWriter = Thread.startVirtualThread(this::runOutboundWriter);
@@ -100,7 +102,11 @@ public class ClientConnection implements AutoCloseable {
     }
 
     public void sendMessage(String topic, byte[] payload) throws IOException {
-        enqueueOutbound(new OutboundFrame(MessageCode.NOTIFICATION.code, UUID.randomUUID(), topic, payload.clone()));
+        try {
+            enqueueOutbound(new OutboundFrame(MessageCode.NOTIFICATION.code, UUID.randomUUID(), topic, payload.clone()));
+        } catch (IOException e) {
+            session.enqueueUndeliveredMessage(topic, payload);
+        }
     }
 
     public UUID getId() {
@@ -111,7 +117,13 @@ public class ClientConnection implements AutoCloseable {
     public void close() {
         closed = true;
         outboundWriter.interrupt();
-        outboundQueue.clear();
+
+        OutboundFrame frame;
+        while ((frame = outboundQueue.poll()) != null) {
+            if (frame.type() == MessageCode.NOTIFICATION.code) {
+                session.enqueueUndeliveredMessage(frame.topic(), frame.message());
+            }
+        }
 
         try {
             socket.close();

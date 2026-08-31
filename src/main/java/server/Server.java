@@ -10,9 +10,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -27,8 +25,8 @@ public class Server implements AutoCloseable {
     private final ExecutorService executor;
     private final CommandRegistry commandRegistry;
     private final AnalyticsService analyticsService = new AnalyticsService();
-    private final Map<String, ClientConnection> clientConnections = new ConcurrentHashMap<>();
-    private final Broker broker = new Broker(new TopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService, clientConnections::get);
+    private final ClientSessionHandler clientSessionHandler = new ClientSessionHandler(ServerBootstrap.DEFAULT_CLIENT_SESSION_DATA_FILE_PATH);
+    private final Broker broker = new Broker(new TopicDataStore(ServerBootstrap.DEFAULT_TOPIC_DATA_FILE_PATH), analyticsService, clientSessionHandler);
     private volatile boolean running = true;
 
     public Server(int port) throws IOException {
@@ -64,22 +62,54 @@ public class Server implements AutoCloseable {
         }
     }
 
+    private AuthenticationRequest authenticateClient(DataInputStream in) throws IOException, ProtocolException, AuthenticationException {
+        Frame frame = FrameReader.readFrame(in);
+
+        if (frame.type() != MessageCode.AUTHENTICATE.code) {
+            throw new ProtocolException("Expected AUTHENTICATE message, got: " + frame.type());
+        }
+
+        DataInputStream authenticationPayload = new DataInputStream(new ByteArrayInputStream(frame.payload()));
+        String clientIdString = authenticationPayload.readUTF();
+        boolean clearSessionIfExists = false;
+        if (authenticationPayload.available() > 0) {
+            clearSessionIfExists = authenticationPayload.readBoolean();
+        }
+
+        try {
+            return new AuthenticationRequest(UUID.fromString(clientIdString), clearSessionIfExists);
+        } catch (IllegalArgumentException e) {
+            throw new AuthenticationException("Invalid UUID format: " + clientIdString);
+        }
+    }
+
     private void handleNewClient(Socket clientSocket) {
         try {
             DataInputStream in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-            UUID clientId = UUID.randomUUID();
-            String clientIdKey = clientId.toString();
+            AuthenticationRequest authRequest = authenticateClient(in);
+            UUID clientId = authRequest.clientId();
 
-            ClientConnection existingConnection = clientConnections.get(clientIdKey);
+            ClientSession existingSession = clientSessionHandler.get(clientId.toString());
+            if (authRequest.clearSessionIfExists() && existingSession != null) {
+                broker.unsubscribeAll(clientId.toString());
+                existingSession.clearSessionData();
+                logger.info("Session reset for client (ID: %s) during authentication".formatted(clientId));
+            }
+
+            ClientSession session = existingSession != null ? existingSession : clientSessionHandler.getOrCreate(clientId);
+
+            ClientConnection existingConnection = session.getClientConnection();
             if (existingConnection != null) {
                 logger.info("Client (ID: %s) is already connected. Closing the existing connection.".formatted(clientId));
                 existingConnection.close();
             }
 
-            ClientConnection clientConn = new ClientConnection(clientSocket, in, commandRegistry, analyticsService, clientId);
-            clientConnections.put(clientIdKey, clientConn);
+            ClientConnection clientConn = new ClientConnection(clientSocket, in, commandRegistry, analyticsService, clientId, session);
+            session.setClientConnection(clientConn);
             analyticsService.recordClientConnected();
             logger.info("new client connected (ID: %s)".formatted(clientConn.getId()));
+
+            session.flushUndeliveredMessages();
 
             try {
                 clientConn.reader();
@@ -88,11 +118,14 @@ public class Server implements AutoCloseable {
             } catch (EOFException e) {
                 logger.info("client disconnected (ID: %s)".formatted(clientConn.getId()));
             } finally {
-                clientConnections.remove(clientIdKey, clientConn);
+                // broker.unsubscribeAll(clientId.toString());
+                session.setClientConnection(null);
                 clientConn.close();
                 analyticsService.recordClientDisconnected();
             }
-        } catch (IOException e) {
+        } catch (AuthenticationException e) {
+            logger.log(Level.WARNING, "authentication failed", e);
+        } catch (IOException | ProtocolException e) {
             logger.log(Level.WARNING, "client error", e);
         }
     }
@@ -106,8 +139,7 @@ public class Server implements AutoCloseable {
         running = false;
         try {
             broker.shutdown();
-            clientConnections.values().forEach(ClientConnection::close);
-            clientConnections.clear();
+            clientSessionHandler.close();
             server.close();
             executor.shutdown();
         } catch (IOException e) {
@@ -115,4 +147,6 @@ public class Server implements AutoCloseable {
         }
     }
 
+    private record AuthenticationRequest(UUID clientId, boolean clearSessionIfExists) {
+    }
 }
